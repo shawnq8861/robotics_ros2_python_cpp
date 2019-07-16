@@ -24,12 +24,12 @@ class Talker(Node):
         super().__init__('talker')
         self.i = 0
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
-        timer_period = 1.0
+        timer_period = 1.65
         self.tmr = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
         msg = String()
-        msg.data = 'Hello Gaia Platform: {0}'.format(self.i)
+        msg.data = 'Hello Gaia from ROS2: {0}'.format(self.i)
         self.i += 1
         self.get_logger().info('Publishing: "{0}"'.format(msg.data))
         self.pub.publish(msg)

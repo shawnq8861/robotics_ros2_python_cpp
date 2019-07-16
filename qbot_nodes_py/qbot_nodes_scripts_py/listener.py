@@ -25,7 +25,7 @@ class Listener(Node):
         self.sub = self.create_subscription(String, 'pub_chatter', self.chatter_callback, 10)
 
     def chatter_callback(self, msg):
-        self.get_logger().info('I hear this: [%s]' % msg.data)
+        self.get_logger().info('I heard the follwing: [%s]' % msg.data)
 
 
 def main(args=None):
