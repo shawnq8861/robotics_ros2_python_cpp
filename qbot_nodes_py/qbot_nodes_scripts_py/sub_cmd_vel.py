@@ -28,10 +28,12 @@ class SubCmdVel(Node):
         self.get_logger().info('linear.x: [%s]' % str(vel_msg.linear.x))
         #
         # build the command string
-        # use arg passed in for speed
         #
         cmd_str = "echo "
         vel_value = int(vel_msg.linear.x)
+        #
+        # handle the different cases
+        #
         if vel_value == 0:
             cmd_str = cmd_str + "000"
         if 0 < vel_value < 10:
