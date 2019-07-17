@@ -16,7 +16,6 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import subprocess
-import sys
 
 class SubCmdVel(Node):
 
