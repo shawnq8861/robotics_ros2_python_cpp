@@ -19,28 +19,32 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
 
-class Talker(Node):
+class PubCmdVel(Node):
 
     def __init__(self):
-        super().__init__('talker')
+        super().__init__('pub_cmd_vel')
         self.i = 0
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        timer_period = 1.65
+        timer_period = .75
         self.tmr = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
-        msg = Twist()
-        msg.data.linear.x = 2.3
-        msg.data.linear.y = 
+        vel_msg = Twist()
+        vel_msg.linear.x = 2.3
+        vel_msg.linear.y = 1.1
+        vel_msg.linear.z = 0.0
+        vel_msg.angular.x = 0.0
+        vel_msg.angular.y = 0.0
+        vel_msg.angular.z = 5.0
         self.i += 1
-        self.get_logger().info('Publishing: "{0}"'.format(msg.data))
-        self.pub.publish(msg)
+        self.get_logger().info('Publishing: "{0}"'.format(str(vel_msg)))
+        self.pub.publish(vel_msg)
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node = Talker()
+    node = PubCmdVel()
 
     rclpy.spin(node)
 

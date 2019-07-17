@@ -14,10 +14,9 @@
 
 import rclpy
 from rclpy.node import Node
-
-#from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-
+import subprocess
+import sys
 
 class SubCmdVel(Node):
 
@@ -25,8 +24,27 @@ class SubCmdVel(Node):
         super().__init__('sub_cmd_vel')
         self.sub = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 10)
 
-    def cmd_vel_callback(self, msg):
-        self.get_logger().info('linear: [%s]' % str(msg.data.linear))
+    def cmd_vel_callback(self, vel_msg):
+        self.get_logger().info('linear.x: [%s]' % str(vel_msg.linear.x))
+        #
+        # build the command string
+        # use arg passed in for speed
+        #
+        cmd_str = "echo "
+        vel_value = int(vel_msg.linear.x)
+        if vel_value == 0:
+            cmd_str = cmd_str + "000"
+        if 0 < vel_value < 10:
+            cmd_str = cmd_str + "00"
+            cmd_str = cmd_str + str(vel_value)
+        if 10 <= vel_value < 100:
+            cmd_str = cmd_str + "0"
+            cmd_str = cmd_str + str(vel_value)
+        if vel_value >= 100:
+            cmd_str = cmd_str + "100"
+        cmd_str = cmd_str + " > /dev/ttyACM0"
+        print(cmd_str)
+        subprocess.call(cmd_str, shell=True)
 
 
 def main(args=None):
