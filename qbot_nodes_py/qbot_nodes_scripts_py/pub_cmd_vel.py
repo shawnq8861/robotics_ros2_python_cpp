@@ -14,8 +14,6 @@
 
 import rclpy
 from rclpy.node import Node
-
-#from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 
 
@@ -30,7 +28,7 @@ class PubCmdVel(Node):
 
     def timer_callback(self):
         vel_msg = Twist()
-        vel_msg.linear.x = 2.3
+        vel_msg.linear.x = 0.0
         vel_msg.linear.y = 1.1
         vel_msg.linear.z = 0.0
         vel_msg.angular.x = 0.0
