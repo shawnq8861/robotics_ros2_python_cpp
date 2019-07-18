@@ -49,12 +49,12 @@ public:
         //msg_ = std::make_unique<std_msgs::msg::String>();
         msg_ = std::make_unique<geometry_msgs::msg::Twist>();
         //msg_->data = "Hello World: " + std::to_string(count_++);
-        msg_->linear.x = 0.0;
+        msg_->linear.x = 23.4;
         msg_->linear.y = 0.0;
         msg_->linear.z = 0.0;
         msg_->angular.x = 0.0;
         msg_->angular.y = 0.0;
-        msg_->angular.z = 0.0;
+        msg_->angular.z = 5.0;
         RCLCPP_INFO(this->get_logger(), "Publishing: '%f'", msg_->linear.x);
 
         // Put the message into a queue to be processed by the middleware.

@@ -20,6 +20,7 @@
 #include "rcutils/cmdline_parser.h"
 
 #include "std_msgs/msg/string.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 
 void print_usage()
 {
@@ -41,20 +42,20 @@ public:
     // Create a callback function for when messages are received.
     // Variations of this function also exist using, for example UniquePtr for zero-copy transport.
     auto callback =
-      [this](const std_msgs::msg::String::SharedPtr msg) -> void
+      [this](const geometry_msgs::msg::Twist::SharedPtr msg) -> void
       {
-        RCLCPP_INFO(this->get_logger(), "I heard: [%s]", msg->data.c_str());
+        RCLCPP_INFO(this->get_logger(), "I heard: [%f]", msg->linear.x);
       };
 
     // Create a subscription to the topic which can be matched with one or more compatible ROS
     // publishers.
     // Note that not all publishers on the same topic with the same type will be compatible:
     // they must have compatible Quality of Service policies.
-    sub_ = create_subscription<std_msgs::msg::String>(topic_name, 10, callback);
+    sub_ = create_subscription<geometry_msgs::msg::Twist>(topic_name, 10, callback);
   }
 
 private:
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
 };
 
 int main(int argc, char * argv[])
@@ -73,7 +74,7 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
 
   // Parse the command line options.
-  auto topic = std::string("chatter");
+  auto topic = std::string("cmd_vel");
   char * cli_option = rcutils_cli_get_option(argv, argv + argc, "-t");
   if (nullptr != cli_option) {
     topic = std::string(cli_option);
