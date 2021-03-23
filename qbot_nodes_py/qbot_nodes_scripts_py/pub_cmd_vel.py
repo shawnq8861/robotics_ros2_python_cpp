@@ -15,6 +15,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from qbot_nodes_py.srv import UpdateTwist
 
 
 class PubCmdVel(Node):
@@ -22,21 +23,27 @@ class PubCmdVel(Node):
     def __init__(self):
         super().__init__('pub_cmd_vel')
         self.i = 0
+        self.vel_msg = Twist()
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
         timer_period = .75
         self.tmr = self.create_timer(timer_period, self.timer_callback)
+        self.srv = self.create_service(UpdateTwist, 'update_position', self.update_position_callback)
 
     def timer_callback(self):
-        vel_msg = Twist()
-        vel_msg.linear.x = 0.0
-        vel_msg.linear.y = 1.1
-        vel_msg.linear.z = 0.0
-        vel_msg.angular.x = 0.0
-        vel_msg.angular.y = 0.0
-        vel_msg.angular.z = 5.0
+        self.vel_msg.linear.x = 0.0
+        self.vel_msg.linear.y = 1.1
+        self.vel_msg.linear.z = 0.0
+        self.vel_msg.angular.x = 0.0
+        self.vel_msg.angular.y = 0.0
+        self.vel_msg.angular.z = 5.0
         self.i += 1
-        self.get_logger().info('Publishing: "{0}"'.format(str(vel_msg)))
-        self.pub.publish(vel_msg)
+        self.get_logger().info('Publishing: "{0}"'.format(str(self.vel_msg)))
+        self.pub.publish(self.vel_msg)
+
+    def update_position_callback(self, request, response):
+        self.vel_msg = request.goal_twist
+        response.result = 0
+        return response.result
 
 
 def main(args=None):

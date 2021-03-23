@@ -1,0 +1,5 @@
+# Twist request
+geometry_msgs/Twist goal_twist
+---
+# response
+int8 result

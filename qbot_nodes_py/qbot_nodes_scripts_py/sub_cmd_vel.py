@@ -45,7 +45,7 @@ class SubCmdVel(Node):
             cmd_str = cmd_str + "100"
         cmd_str = cmd_str + " > /dev/ttyACM0"
         print(cmd_str)
-        subprocess.call(cmd_str, shell=True)
+        #subprocess.call(cmd_str, shell=True)
 
 
 def main(args=None):
