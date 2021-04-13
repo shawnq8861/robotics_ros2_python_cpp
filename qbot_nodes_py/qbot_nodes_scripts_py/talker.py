@@ -34,17 +34,15 @@ class Talker(Node):
         self.get_logger().info('Publishing: "{0}"'.format(msg.data))
         self.pub.publish(msg)
 
-
 def main(args=None):
     rclpy.init(args=args)
 
-    node = Talker()
+    talker = Talker()
 
-    rclpy.spin(node)
+    rclpy.spin(talker)
 
-    node.destroy_node()
+    talker.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
