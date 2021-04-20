@@ -1,0 +1,11 @@
+remember to source the ROS 2 install:
+
+:~/ros2_ws$ source /opt/ros/foxy/setup.bash
+
+and source the package(s) after building:
+
+:~/ros2_ws$ . install/setup.bash
+
+and:
+
+:~/ros2_ws$ source install/setup.bash
