@@ -17,16 +17,26 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(pub_cmd_vel src/pub_cmd_vel.cpp)
-target_include_directories(pub_cmd_vel PUBLIC
+add_executable(talker src/talker.cpp)
+ament_target_dependencies(talker rclcpp std_msgs)
+add_executable(listener src/listener.cpp)
+ament_target_dependencies(listener rclcpp std_msgs)
+target_include_directories(talker PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_include_directories(listener PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS pub_cmd_vel
+install(TARGETS talker
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS listener
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
