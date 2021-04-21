@@ -1,11 +1,31 @@
-remember to source the ROS 2 install:
+Remember to source the ROS 2 install:
 
 :~/ros2_ws$ source /opt/ros/foxy/setup.bash
 
-and source the package(s) after building:
+and source the ROS 2 package(s) after building:
 
 :~/ros2_ws$ . install/setup.bash
 
 and:
 
 :~/ros2_ws$ source install/setup.bash
+
+calibration targets:
+
+https://markhedleyjones.com/projects/calibration-checkerboard-collection
+
+Sourcing on the Coral Dev Board:
+
+Source the ROS 2 install:
+
+:~/ source ~/install_aarch64/setup.bash
+
+Source the ROS 2 packages:
+
+:~/ source ~/ros2_ws/install/setup.bash
+
+Run the talker and listener examples:
+
+:~$ ros2 run qbot_nodes_cpp talker
+:~$ ros2 run qbot_nodes_cpp listener
+
