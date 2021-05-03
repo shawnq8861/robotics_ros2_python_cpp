@@ -17,26 +17,40 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(OpenCV REQUIRED)
 
 add_executable(talker src/talker.cpp)
 ament_target_dependencies(talker rclcpp std_msgs)
-add_executable(listener src/listener.cpp)
-ament_target_dependencies(listener rclcpp std_msgs)
 target_include_directories(talker PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+  
+add_executable(listener src/listener.cpp)
+ament_target_dependencies(listener rclcpp std_msgs)
 target_include_directories(listener PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+add_executable(uvc_camera src/uvc_camera.cpp)
+ament_target_dependencies(uvc_camera 
+	rclcpp 
+	std_msgs
+	sensor_msgs
+	OpenCV)
+target_include_directories(uvc_camera PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS talker
   DESTINATION lib/${PROJECT_NAME})
+  
 install(TARGETS listener
+  DESTINATION lib/${PROJECT_NAME})
+  
+install(TARGETS uvc_camera
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
