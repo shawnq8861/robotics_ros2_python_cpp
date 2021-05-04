@@ -1,8 +1,12 @@
 import cv2
+import argparse
 
 def main():
+    parser = argparse.ArgumentParser(description='Process an integer arg')
+    parser.add_argument('camera_idx', type=int)
+    args = parser.parse_args()
     cap = cv2.VideoCapture()
-    cap.open(1)
+    cap.open(args.camera_idx)
     if cap.isOpened():
         ret, frame = cap.read()
         h,  w = frame.shape[:2]
