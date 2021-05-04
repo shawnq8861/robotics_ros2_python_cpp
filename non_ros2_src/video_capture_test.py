@@ -8,6 +8,12 @@ def main():
         h,  w = frame.shape[:2]
         print("cols = ", w)
         print("rows = ", h)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        ret, frame = cap.read()
+        h,  w = frame.shape[:2]
+        print("cols = ", w)
+        print("rows = ", h)
         cv2.imwrite("coral_image.png", frame)
 
 
