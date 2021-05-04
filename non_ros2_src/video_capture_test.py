@@ -14,6 +14,8 @@ def main():
         h,  w = frame.shape[:2]
         print("cols = ", w)
         print("rows = ", h)
+        api = cap.get(cv2.CAP_PROP_BACKEND)
+        print("backend api = ", api)
         cv2.imwrite("coral_image.png", frame)
 
 
