@@ -12,18 +12,24 @@ from rclpy.node import Node
 from std_msgs.msg import String
 
 import cv2
-#import numpy as np
+import argparse
+import time
+
+from qbot_nodes_cpp.srv import CameraCommand
 
 class UVCCamera(Node):
 
-    def __init__(self):
+    def __init__(self, camera_idx, timer_period):
         super().__init__('uvc_camera')
+        self.camera_command = 99
         self.i = 0
+        self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
-        self.id = 2
+        print("camera idx = ", camera_idx)
+        self.idx = camera_idx
         self.cap = cv2.VideoCapture()
         self.init_camera()
-        timer_period = .5
+        self.timer_period = timer_period
         self.tmr = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
@@ -36,20 +42,39 @@ class UVCCamera(Node):
         h,  w = self.frame.shape[:2]
         print("cols = ", w)
         print("rows = ", h)
+        curr_time = time.ctime()
+        print(curr_time)
+        new_time = curr_time.replace(' ', '_')
+        print(new_time)
+        if self.camera_command == 1:
+            cv2.imwrite(new_time + '.png', self.frame)
+
+    def camera_command_callback(self, request, response):
+        self.camera_command = request.command
+        self.get_logger().info('Incoming request.command: %d' % (request.command))
+
+        return response
 
     def init_camera(self):
-        self.cap.open(self.id)
+        self.cap.open(self.idx)
         if self.cap.isOpened():
             print("opened camera...")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
         else:
             print("could not open camera...")
 
 def main(args=None):
-    rclpy.init(args=args)
 
-    uvc_camera = UVCCamera()
+    parser = argparse.ArgumentParser(description='Process an integer arg')
+    parser.add_argument('camera_idx', type=int)
+    parser.add_argument('timer_period', type=float)
+    args = parser.parse_args()
+
+    rclpy.init()
+
+    uvc_camera = UVCCamera(args.camera_idx, args.timer_period)
 
     rclpy.spin(uvc_camera)
 
