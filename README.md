@@ -2,7 +2,7 @@
 
 ## Summary
 A ROS 2 package for a differential drive, wheeled robot.
-...
+```
 
 ## Nodes
 More details to follow, but will include:
