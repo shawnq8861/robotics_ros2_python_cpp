@@ -10,4 +10,8 @@ Camera node
 Base controller
 Local planner
 Odometry
+URDF
+Meshes
+Rviz config
+3D information extraction from monocular images
 ```
