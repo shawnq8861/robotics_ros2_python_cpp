@@ -36,12 +36,12 @@ void print_usage()
 class SubCmdVel : public rclcpp::Node
 {
 public:
-  explicit SubCmdVel(const std::string & topic_name)
-  : Node("sub_cmd_vel")
+  explicit BaseController(const std::string & cmd_vel_topic)
+  : Node("base_controller")
   {
     // Create a callback function for when messages are received.
     // Variations of this function also exist using, for example UniquePtr for zero-copy transport.
-    auto callback =
+    auto cmdVelCallback =
       [this](const geometry_msgs::msg::Twist::SharedPtr msg) -> void
       {
         RCLCPP_INFO(this->get_logger(), "I heard: [%f]", msg->linear.x);
@@ -51,7 +51,7 @@ public:
     // publishers.
     // Note that not all publishers on the same topic with the same type will be compatible:
     // they must have compatible Quality of Service policies.
-    sub_ = create_subscription<geometry_msgs::msg::Twist>(topic_name, 10, callback);
+    sub_ = create_subscription<geometry_msgs::msg::Twist>(cmd_vel_topic, 10, cmdVelCallback);
   }
 
 private:
@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
   }
 
   // Create a node.
-  auto node = std::make_shared<SubCmdVel>(topic);
+  auto node = std::make_shared<BaseController>(topic);
 
   // spin will block until work comes in, execute work as it becomes available, and keep blocking.
   // It will only be interrupted by Ctrl-C.
