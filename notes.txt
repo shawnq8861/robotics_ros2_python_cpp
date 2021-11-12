@@ -16,9 +16,19 @@ https://markhedleyjones.com/projects/calibration-checkerboard-collection
 
 Sourcing on the Coral Dev Board:
 
+install ROS 2 by crosscompiling
+
 Source the ROS 2 install:
 
 :~/ source ~/install_aarch64/setup.bash
+
+clone the repository
+
+git clone https://github.com/Aigenrobotics/Alpha-ROS2.git
+
+build the package
+
+:~/ colcon build
 
 Source the ROS 2 packages:
 
@@ -28,4 +38,8 @@ Run the talker and listener examples:
 
 :~$ ros2 run qbot_nodes_cpp talker
 :~$ ros2 run qbot_nodes_cpp listener
+
+May need to do the following if Python publishers return type errors:
+
+export PYTHONPATH=/opt/ros/foxy/lib/python3.8/site-packages
 

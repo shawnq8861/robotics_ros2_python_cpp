@@ -14,7 +14,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    author='Esteve Fernandez',
+    author='Shawn Quinn',
     author_email='shawnquinn861@gmail.com',
     maintainer='Shawn Quinn',
     maintainer_email='shawnquinn861@gmail.com',
@@ -32,8 +32,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'listener = qbot_nodes_scripts_py.listener:main',
-            'talker = qbot_nodes_scripts_py.talker:main'
+            'listener = src.listener:main',
+            'talker = src.talker:main',
+            'uvc_camera = src.uvc_camera:main',
+            'camera_command_client = src.camera_command_client:main'
         ],
     },
 )

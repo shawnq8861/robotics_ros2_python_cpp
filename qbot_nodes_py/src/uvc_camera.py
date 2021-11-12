@@ -3,7 +3,7 @@
 # clone the repository        :~/ros2_ws/src$ git clone .......
 # from ros2 workspace folder  :~/ros2_ws$ colcon build
 # source the setup.bash file  :~/ros2_ws$ source .install/setup.bash
-# start the node              :~/ros2_ws$ ros2 run qbot_nodes_py uvc_camer
+# start the node              :~/ros2_ws$ ros2 run qbot_nodes_py uvc_camera
 #
 
 import rclpy
@@ -43,7 +43,6 @@ class UVCCamera(Node):
         print("cols = ", w)
         print("rows = ", h)
         curr_time = time.ctime()
-        print(curr_time)
         new_time = curr_time.replace(' ', '_')
         print(new_time)
         if self.camera_command == 1:
@@ -67,7 +66,7 @@ class UVCCamera(Node):
 
 def main(args=None):
 
-    parser = argparse.ArgumentParser(description='Process an integer arg')
+    parser = argparse.ArgumentParser(description='Process an integer arg and a float arg')
     parser.add_argument('camera_idx', type=int)
     parser.add_argument('timer_period', type=float)
     args = parser.parse_args()

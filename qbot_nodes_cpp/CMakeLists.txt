@@ -21,6 +21,11 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/CameraCommand.srv"
+ )
 
 add_executable(talker src/talker.cpp)
 ament_target_dependencies(talker rclcpp std_msgs)
@@ -43,15 +48,36 @@ ament_target_dependencies(uvc_camera
 target_include_directories(uvc_camera PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+  
+add_executable(realtime_tests src/realtime_tests.cpp)
+ament_target_dependencies(realtime_tests 
+	rclcpp 
+	std_msgs
+	sensor_msgs)
+target_include_directories(realtime_tests PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(TARGETS talker
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME}
+)
   
 install(TARGETS listener
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME}
+)
   
 install(TARGETS uvc_camera
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME}
+)
+  
+install(TARGETS realtime_tests
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY src launch rviz urdf meshes
+  DESTINATION share/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
