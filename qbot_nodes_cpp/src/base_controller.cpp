@@ -24,8 +24,8 @@
 
 void print_usage()
 {
-  printf("Usage for listener app:\n");
-  printf("listener [-t topic_name] [-h]\n");
+  printf("Usage for base_controller app:\n");
+  printf("base_controller [-t topic_name] [-h]\n");
   printf("options:\n");
   printf("-h : Print this help function.\n");
   printf("-t topic_name : Specify the topic on which to subscribe. Defaults to chatter.\n");
@@ -33,7 +33,7 @@ void print_usage()
 
 // Create a Listener class that subclasses the generic rclcpp::Node base class.
 // The main function below will instantiate the class as a ROS node.
-class SubCmdVel : public rclcpp::Node
+class BaseController : public rclcpp::Node
 {
 public:
   explicit BaseController(const std::string & cmd_vel_topic)
