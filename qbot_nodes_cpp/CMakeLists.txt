@@ -67,6 +67,14 @@ target_include_directories(base_controller PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+add_executable(local_planner src/local_planner.cpp)
+ament_target_dependencies(local_planner 
+  rclcpp
+  geometry_msgs)
+target_include_directories(local_planner PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 install(TARGETS talker
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -84,6 +92,10 @@ install(TARGETS realtime_tests
 )
 
 install(TARGETS base_controller
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS local_planner
   DESTINATION lib/${PROJECT_NAME}
 )
 

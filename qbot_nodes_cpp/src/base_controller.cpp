@@ -18,7 +18,8 @@ public:
 private:
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
-      RCLCPP_INFO(this->get_logger(), "I heard: [%f]", msg->linear.x);
+      RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", msg->linear.x);
+      RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", msg->angular.z);
     }
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
 };
