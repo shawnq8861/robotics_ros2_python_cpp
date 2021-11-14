@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
@@ -58,6 +59,14 @@ target_include_directories(realtime_tests PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+add_executable(base_controller src/base_controller.cpp)
+ament_target_dependencies(base_controller 
+  rclcpp
+  geometry_msgs)
+target_include_directories(base_controller PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 install(TARGETS talker
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -71,6 +80,10 @@ install(TARGETS uvc_camera
 )
   
 install(TARGETS realtime_tests
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS base_controller
   DESTINATION lib/${PROJECT_NAME}
 )
 
