@@ -24,9 +24,18 @@ find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
+#
+# need the following to enable building custom services
+#
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/CameraCommand.srv"
+  "srv/HeadingSpeed.srv"
  )
+
+#
+# needed to enable using custom srv files
+#
+ament_export_dependencies(rosidl_default_runtime)
 
 add_executable(talker src/talker.cpp)
 ament_target_dependencies(talker rclcpp std_msgs)
@@ -75,27 +84,19 @@ target_include_directories(local_planner PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS talker
-  DESTINATION lib/${PROJECT_NAME}
-)
-  
-install(TARGETS listener
-  DESTINATION lib/${PROJECT_NAME}
-)
-  
-install(TARGETS uvc_camera
-  DESTINATION lib/${PROJECT_NAME}
-)
-  
-install(TARGETS realtime_tests
-  DESTINATION lib/${PROJECT_NAME}
-)
+#
+# need the following to enable using the custon srv
+#
+rosidl_target_interfaces(local_planner
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-install(TARGETS base_controller
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-install(TARGETS local_planner
+install(TARGETS 
+  talker
+  listener
+  uvc_camera
+  realtime_tests
+  base_controller
+  local_planner
   DESTINATION lib/${PROJECT_NAME}
 )
 
