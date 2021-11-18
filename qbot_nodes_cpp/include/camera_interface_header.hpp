@@ -1,20 +1,21 @@
 #ifndef CAMERA_HEADER_HPP
 #define CAMERA_HEADER_HPP
 //
-// sony camera interface header
+// camera interface header
 //
 #include <sensor_msgs/msg/image.hpp>
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/videoio.hpp>
 #include <opencv4/opencv2/highgui.hpp>
+#include "qbot_nodes_cpp/srv/camera_command.hpp"
 
-static const int idle = 99;
+enum CameraCommand {Idle, Show, Save, Quit};
 
 class CameraControl
 {
 public:
     CameraControl()
-    {control_value = idle;};
+    {control_value = Idle;};
     ~CameraControl(){};
     int get_control_value()
     {
@@ -37,7 +38,7 @@ public:
     //    }
     //}
 private:
-    int control_value;
+    CameraCommand control_value;
 };
 
 #endif

@@ -18,6 +18,7 @@ class UVC_Camera : public rclcpp::Node
     UVC_Camera()
     : Node("uvc_camera"), count_(0)
     {
+      command = Idle;
       publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
       timer_ = this->create_wall_timer(
       200ms, std::bind(&UVC_Camera::timer_callback, this));
@@ -42,6 +43,25 @@ class UVC_Camera : public rclcpp::Node
       std::cout << "frame cols = " << frame.cols << std::endl;
       //ROS_INFO_STREAM("frame rows = " << frame.rows);
       std::cout << "frame rows = " << frame.rows << std::endl;
+
+      switch (command)
+      {
+      case Idle:
+        /* code */
+        break;
+      case Show:
+        //
+        // call show image
+        //
+        command = Idle;
+        show_image();
+        break;
+      case Save:
+
+      
+      default:
+        break;
+      }
     }
 
     void init_camera()
@@ -85,11 +105,23 @@ class UVC_Camera : public rclcpp::Node
         //ROS_INFO_STREAM("frame rows = " << frame.rows);
       }
     }
+
+    void show_image() {
+      // named window
+      // imshow
+      // waitkey
+    }
+
+    void save_image() {
+      // imwrite
+    }
+    
     cv::Mat frame;
     cv::VideoCapture cap;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     size_t count_;
+    CameraCommand commad;
 };
 
 int main(int argc, char * argv[])

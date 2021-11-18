@@ -8,9 +8,11 @@ using std::placeholders::_1;
 class BaseController : public rclcpp::Node
 {
 public:
-    BaseController()
+    BaseController(double width, double diameter)
     : Node("base_controller")
     {
+        wheel_base_ = width;
+        wheel_diameter_ = diameter;
         subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "cmd_vel", 10, std::bind(&BaseController::cmd_vel_callback, this, _1));
     }
@@ -20,8 +22,18 @@ private:
     {
         RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", msg->linear.x);
         RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", msg->angular.z);
+        drive_wheels();
+    }
+    void drive_wheels() {
+        //
+        // use kinematic model to compute each wheel rotational velocity
+        // output to the RoboClaw
+        //
+        
     }
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
+    double wheel_base_;
+    double wheel_diameter_;
 };
 
 int main(int argc, char * argv[])
