@@ -87,6 +87,9 @@ target_include_directories(local_planner PUBLIC
 #
 # need the following to enable using the custon srv
 #
+rosidl_target_interfaces(uvc_camera
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
 rosidl_target_interfaces(local_planner
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 

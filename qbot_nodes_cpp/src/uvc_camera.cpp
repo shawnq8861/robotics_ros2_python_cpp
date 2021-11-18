@@ -115,13 +115,13 @@ class UVC_Camera : public rclcpp::Node
     void save_image() {
       // imwrite
     }
-    
+
     cv::Mat frame;
     cv::VideoCapture cap;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     size_t count_;
-    CameraCommand commad;
+    int command;
 };
 
 int main(int argc, char * argv[])

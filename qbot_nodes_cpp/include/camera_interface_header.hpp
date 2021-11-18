@@ -38,7 +38,7 @@ public:
     //    }
     //}
 private:
-    CameraCommand control_value;
+    int control_value;
 };
 
 #endif
