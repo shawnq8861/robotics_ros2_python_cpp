@@ -29,7 +29,7 @@ private:
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
         //
-        
+
     }
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
     double wheel_base_;
@@ -39,7 +39,9 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<BaseController>();
+    double width = 18.0;
+    double diameter = 6.0;
+    auto node = std::make_shared<BaseController>(width, diameter);
     rclcpp::spin(node);
     rclcpp::shutdown();
     
