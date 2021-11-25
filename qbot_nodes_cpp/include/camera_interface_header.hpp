@@ -4,6 +4,7 @@
 // camera interface header
 //
 #include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/image_encodings.hpp>
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/videoio.hpp>
 #include <opencv4/opencv2/highgui.hpp>
