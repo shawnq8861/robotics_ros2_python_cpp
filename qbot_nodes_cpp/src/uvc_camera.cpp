@@ -40,8 +40,8 @@ class UVC_Camera : public rclcpp::Node
       //ROS_INFO_STREAM("frame rows = " << frame.rows);
       std::cout << "frame rows = " << frame.rows << std::endl;
 
-      img_msg_ptr = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
-      img_publisher_->publish(*img_msg_ptr);
+      //img_msg_ptr = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
+      //img_publisher_->publish(*img_msg_ptr);
 
       switch (command)
       {
