@@ -23,6 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(cv_bridge)
 
 #
 # need the following to enable building custom services
@@ -54,7 +55,8 @@ ament_target_dependencies(uvc_camera
 	rclcpp 
 	std_msgs
 	sensor_msgs
-	OpenCV)
+	OpenCV
+  cv_bridge)
 target_include_directories(uvc_camera PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)

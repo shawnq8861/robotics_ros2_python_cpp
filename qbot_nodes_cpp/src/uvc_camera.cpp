@@ -19,7 +19,7 @@ class UVC_Camera : public rclcpp::Node
     : Node("uvc_camera"), count_(0)
     {
       command = Idle;
-      publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+      img_publisher_ = this ->create_publisher<sensor_msgs::msg::Image>("uvc_camera/image", 1);
       timer_ = this->create_wall_timer(
       200ms, std::bind(&UVC_Camera::timer_callback, this));
       init_camera();
@@ -31,10 +31,6 @@ class UVC_Camera : public rclcpp::Node
   private:
     void timer_callback()
     {
-      auto message = std_msgs::msg::String();
-      message.data = "Camera node says hello... " + std::to_string(count_++);
-      //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-      publisher_->publish(message);
       //
       // publish the image
       //
@@ -43,6 +39,9 @@ class UVC_Camera : public rclcpp::Node
       std::cout << "frame cols = " << frame.cols << std::endl;
       //ROS_INFO_STREAM("frame rows = " << frame.rows);
       std::cout << "frame rows = " << frame.rows << std::endl;
+
+      img_msg_ptr = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
+      img_publisher_->publish(*img_msg_ptr);
 
       switch (command)
       {
@@ -117,9 +116,10 @@ class UVC_Camera : public rclcpp::Node
     }
 
     cv::Mat frame;
+    sensor_msgs::msg::Image::SharedPtr img_msg_ptr;
     cv::VideoCapture cap;
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr img_publisher_; 
     size_t count_;
     int command;
 };
