@@ -9,19 +9,17 @@
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
-
 class UVC_Camera : public rclcpp::Node
 {
 public:
     UVC_Camera()
-    : Node("uvc_camera"), count_(0)
+    : Node("uvc_camera")
     {
         command = Idle;
         img_publisher_ = this->create_publisher<sensor_msgs::msg::Image>("uvc_camera/image", 1);
         timer_ = this->create_wall_timer(
             200ms, std::bind(&UVC_Camera::timer_callback, this));
+        sensor_msgs::msg::Image::UniquePtr img_ptr(new sensor_msgs::msg::Image());
         init_camera();
         //
         // advertise the save image service
@@ -35,16 +33,16 @@ private:
         // publish the image
         //
         cap >> frame;
-        //ROS_INFO_STREAM("frame cols = " << frame.cols);
-        std::cout << "frame cols = " << frame.cols << std::endl;
-        //ROS_INFO_STREAM("frame rows = " << frame.rows);
-        std::cout << "frame rows = " << frame.rows << std::endl;
-
-        //img_msg_ptr = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
-        //img_publisher_->publish(*img_msg_ptr);
-
+        RCLCPP_INFO_STREAM(this->get_logger(), "frame cols = " << frame.cols);
+        RCLCPP_INFO_STREAM(this->get_logger(), "frame rows = " << frame.rows);
+        double frame_rate = cap.get(cv::CAP_PROP_FPS);
+        RCLCPP_INFO_STREAM(this->get_logger(), "frame rate = " << frame_rate);
         auto stamp = now();
-
+        //
+        // the img_msg pointer is deleted automatically when the local 
+        // variable goes out of scope
+        //
+        sensor_msgs::msg::Image::UniquePtr img_msg(new sensor_msgs::msg::Image());
         img_msg->header.stamp = stamp;
         img_msg->height = frame.rows;
         img_msg->width = frame.cols;
@@ -52,13 +50,12 @@ private:
         img_msg->is_bigendian = false;
         img_msg->step = static_cast<sensor_msgs::msg::Image::_step_type>(frame.step);
         img_msg->data.assign(frame.datastart, frame.dataend);
-
         img_publisher_->publish(std::move(img_msg));
 
         switch (command)
         {
         case Idle:
-            /* code */
+            
             break;
         case Show:
             //
@@ -71,7 +68,8 @@ private:
 
         default:
             break;
-      }
+        }
+
     }
 
     void init_camera()
@@ -79,8 +77,7 @@ private:
         //
         // set up video capture
         //
-        //cv::VideoCapture cap;
-        int deviceID = 2;              // 0 = open default camera
+        int deviceID = 7;              // 0 = open default camera
         int apiID = cv::CAP_GSTREAMER; // 0 = autodetect default API
         //
         // open selected camera using selected API
@@ -93,32 +90,18 @@ private:
         else
         {
             double api = cap.get(cv::CAP_PROP_BACKEND);
-            //ROS_INFO_STREAM("backend = " << api);
-            std::cout << "backend = " << api << std::endl;
+            RCLCPP_INFO_STREAM(this->get_logger(), "backend = " << api);
             double frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-            //ROS_INFO_STREAM("frame width = " << frame_width);
+            RCLCPP_INFO_STREAM(this->get_logger(), "frame width = " << frame_width);
             double frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-            //ROS_INFO_STREAM("frame height = " << frame_height);
-            double frame_rate = cap.get(cv::CAP_PROP_FPS);
-            //ROS_INFO_STREAM("frame rate = " << frame_rate);
-            double fps = 5.0;
+            RCLCPP_INFO_STREAM(this->get_logger(), "frame height = " << frame_height);
+            double fps = 1.0;
             cap.set(cv::CAP_PROP_FPS, fps);
-            frame_rate = cap.get(cv::CAP_PROP_FPS);
-            std::cout << "frame rate = " << frame_rate << std::endl;
-            //ROS_INFO_STREAM("frame rate = " << frame_rate);
-            frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-            //ROS_INFO_STREAM("frame width = " << frame_width);
-            std::cout << "frame width = " << frame_width << std::endl;
-            frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-            //ROS_INFO_STREAM("frame height = " << frame_height);
-            std::cout << "frame height " << frame_height << std::endl;
-            //cv::Mat frame;
-            //ROS_INFO_STREAM("frame cols = " << frame.cols);
-            //ROS_INFO_STREAM("frame rows = " << frame.rows);
         }
     }
 
-    void show_image() {
+    void show_image()
+    {
         // named window
         // imshow
         // waitkey
@@ -130,12 +113,9 @@ private:
     }
 
     cv::Mat frame;
-    sensor_msgs::msg::Image::SharedPtr img_msg_ptr;
-    sensor_msgs::msg::Image::UniquePtr img_msg;
     cv::VideoCapture cap;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr img_publisher_;
-    size_t count_;
     int command;
 };
 
