@@ -86,7 +86,8 @@ private:
         //
         // set up video capture
         //
-        int apiID = cv::CAP_GSTREAMER; // 0 = autodetect default API
+        //int apiID = cv::CAP_GSTREAMER; // 0 = autodetect default API
+        int apiID = 0; // 0 = autodetect default API
         //
         // open selected camera using selected API
         //
