@@ -1,3 +1,8 @@
+//
+// to run from commad line, use appropriate /dev/video* value for cam_idx:
+// ros2 run qbot_nodes_cpp uvc_camera --ros-args -p cam_idx:=7
+//
+
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -15,6 +20,10 @@ public:
     UVC_Camera()
     : Node("uvc_camera")
     {
+        this->declare_parameter<int>("cam_idx", 1);
+        rclcpp::Parameter cam_idx_param = this->get_parameter("cam_idx");
+        camera_idx = cam_idx_param.as_int();
+        RCLCPP_INFO_STREAM(this->get_logger(), "camera idx = " << camera_idx);
         command = Idle;
         img_publisher_ = this->create_publisher<sensor_msgs::msg::Image>("uvc_camera/image", 1);
         timer_ = this->create_wall_timer(
@@ -77,12 +86,11 @@ private:
         //
         // set up video capture
         //
-        int deviceID = 7;              // 0 = open default camera
         int apiID = cv::CAP_GSTREAMER; // 0 = autodetect default API
         //
         // open selected camera using selected API
         //
-        cap.open(deviceID, apiID);
+        cap.open(camera_idx, apiID);
         if (!cap.isOpened())
         {
             std::cerr << "ERROR! Unable to open camera\n";
@@ -117,6 +125,7 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr img_publisher_;
     int command;
+    int camera_idx;
 };
 
 int main(int argc, char *argv[])
