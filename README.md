@@ -15,3 +15,12 @@ Meshes
 Rviz config
 3D information extraction from monocular images
 ```
+
+## Build Requirements
+
+On the Coral Board, will need to run the following commands to allow colcon to fine OpenCV:
+```
+export CMAKE_PREFIX_PATH=/usr/local:$CMAKE_PREFIX_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+```
+
