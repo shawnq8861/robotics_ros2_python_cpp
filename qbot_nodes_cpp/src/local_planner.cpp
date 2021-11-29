@@ -125,7 +125,8 @@ private:
         RCLCPP_INFO_STREAM(this->get_logger(), "rows: " << image.rows);
         RCLCPP_INFO_STREAM(this->get_logger(), "cols: " << image.cols);
         std::string homedir = getenv("HOME");
-        cv::imwrite(homedir + "/Pictures/saved_image.jpg", image);
+        //cv::imwrite(homedir + "/Pictures/saved_image.jpg", image);
+        cv::imwrite("/home/mendel/Pictures/saved_image.jpg", image);
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
