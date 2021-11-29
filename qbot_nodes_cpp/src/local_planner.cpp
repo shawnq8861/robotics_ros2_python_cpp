@@ -1,3 +1,8 @@
+//
+// to run from commad line:
+// ros2 run qbot_nodes_cpp local_planner
+//
+
 #include <chrono>
 #include <functional>
 #include <memory>
