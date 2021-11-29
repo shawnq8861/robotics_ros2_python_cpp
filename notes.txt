@@ -43,3 +43,9 @@ May need to do the following if Python publishers return type errors:
 
 export PYTHONPATH=/opt/ros/foxy/lib/python3.8/site-packages
 
+On the Coral board, run the follwing commands to enable building with OpenCV:
+
+export CMAKE_PREFIX_PATH=/usr/local:$CMAKE_PREFIX_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+
