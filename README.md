@@ -18,7 +18,7 @@ Rviz config
 
 ## Build Requirements
 
-On the Coral Board, will need to run the following commands to allow colcon to fine OpenCV:
+On the Coral Board, you will need to run the following commands to allow colcon to find OpenCV:
 ```
 export CMAKE_PREFIX_PATH=/usr/local:$CMAKE_PREFIX_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
