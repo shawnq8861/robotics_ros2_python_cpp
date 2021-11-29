@@ -22,17 +22,34 @@ public:
     {
         this->declare_parameter<int>("cam_idx", 1);
         rclcpp::Parameter cam_idx_param = this->get_parameter("cam_idx");
-        camera_idx = cam_idx_param.as_int();
-        RCLCPP_INFO_STREAM(this->get_logger(), "camera idx = " << camera_idx);
-        command = Idle;
+        camera_idx_ = cam_idx_param.as_int();
+        RCLCPP_INFO_STREAM(this->get_logger(), "camera idx = " << camera_idx_);
+        command_ = Idle;
         img_publisher_ = this->create_publisher<sensor_msgs::msg::Image>("uvc_camera/image", 1);
         timer_ = this->create_wall_timer(
             200ms, std::bind(&UVC_Camera::timer_callback, this));
-        sensor_msgs::msg::Image::UniquePtr img_ptr(new sensor_msgs::msg::Image());
         init_camera();
         //
         // advertise the save image service
         //
+        //
+        // use lambda expression to handle service callback
+        // to avoid using std::bind, which is messy for sevice callbacks
+        //
+        // command to test:  ros2 service call /camera_command 
+        // qbot_nodes_cpp/srv/CameraCommand "{command: 1}"
+        //
+        auto handle_camera_command =
+            [this](const std::shared_ptr<rmw_request_id_t> request_header,
+                const std::shared_ptr<qbot_nodes_cpp::srv::CameraCommand::Request> request,
+                            std::shared_ptr<qbot_nodes_cpp::srv::CameraCommand::Response> response) -> void
+        {
+            (void)request_header;
+            command_ = request->command;
+            response = 0;
+        };
+        service_ = create_service<qbot_nodes_cpp::srv::CameraCommand>("camera_command", handle_camera_command);
+
     }
 
 private:
@@ -41,10 +58,10 @@ private:
         //
         // publish the image
         //
-        cap >> frame;
-        RCLCPP_INFO_STREAM(this->get_logger(), "frame cols = " << frame.cols);
-        RCLCPP_INFO_STREAM(this->get_logger(), "frame rows = " << frame.rows);
-        double frame_rate = cap.get(cv::CAP_PROP_FPS);
+        cap_ >> frame_;
+        RCLCPP_INFO_STREAM(this->get_logger(), "frame cols = " << frame_.cols);
+        RCLCPP_INFO_STREAM(this->get_logger(), "frame rows = " << frame_.rows);
+        double frame_rate = cap_.get(cv::CAP_PROP_FPS);
         RCLCPP_INFO_STREAM(this->get_logger(), "frame rate = " << frame_rate);
         auto stamp = now();
         //
@@ -53,28 +70,35 @@ private:
         //
         sensor_msgs::msg::Image::UniquePtr img_msg(new sensor_msgs::msg::Image());
         img_msg->header.stamp = stamp;
-        img_msg->height = frame.rows;
-        img_msg->width = frame.cols;
+        img_msg->height = frame_.rows;
+        img_msg->width = frame_.cols;
         img_msg->encoding = sensor_msgs::image_encodings::BGR8;
         img_msg->is_bigendian = false;
-        img_msg->step = static_cast<sensor_msgs::msg::Image::_step_type>(frame.step);
-        img_msg->data.assign(frame.datastart, frame.dataend);
+        img_msg->step = static_cast<sensor_msgs::msg::Image::_step_type>(frame_.step);
+        img_msg->data.assign(frame_.datastart, frame_.dataend);
         img_publisher_->publish(std::move(img_msg));
 
-        switch (command)
+        switch (command_)
         {
         case Idle:
-            
+            RCLCPP_INFO_STREAM(this->get_logger(), "Idle...");
             break;
         case Show:
             //
             // call show image
             //
-            command = Idle;
+            RCLCPP_INFO_STREAM(this->get_logger(), "Show...");
+            command_ = Idle;
             show_image();
             break;
         case Save:
-
+            //
+            // call save image
+            //
+            RCLCPP_INFO_STREAM(this->get_logger(), "Save...");
+            command_ = Idle;
+            save_image();
+            break;
         default:
             break;
         }
@@ -86,26 +110,25 @@ private:
         //
         // set up video capture
         //
-        //int apiID = cv::CAP_GSTREAMER; // 0 = autodetect default API
         int apiID = 0; // 0 = autodetect default API
         //
         // open selected camera using selected API
         //
-        cap.open(camera_idx, apiID);
-        if (!cap.isOpened())
+        cap_.open(camera_idx_, apiID);
+        if (!cap_.isOpened())
         {
             std::cerr << "ERROR! Unable to open camera\n";
         }
         else
         {
-            double api = cap.get(cv::CAP_PROP_BACKEND);
+            double api = cap_.get(cv::CAP_PROP_BACKEND);
             RCLCPP_INFO_STREAM(this->get_logger(), "backend = " << api);
-            double frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+            double frame_width = cap_.get(cv::CAP_PROP_FRAME_WIDTH);
             RCLCPP_INFO_STREAM(this->get_logger(), "frame width = " << frame_width);
-            double frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+            double frame_height = cap_.get(cv::CAP_PROP_FRAME_HEIGHT);
             RCLCPP_INFO_STREAM(this->get_logger(), "frame height = " << frame_height);
             double fps = 1.0;
-            cap.set(cv::CAP_PROP_FPS, fps);
+            cap_.set(cv::CAP_PROP_FPS, fps);
         }
     }
 
@@ -114,19 +137,22 @@ private:
         // named window
         // imshow
         // waitkey
+        RCLCPP_INFO_STREAM(this->get_logger(), "show image...");
     }
 
     void save_image()
     {
         // imwrite
+        RCLCPP_INFO_STREAM(this->get_logger(), "save image...");
     }
 
-    cv::Mat frame;
-    cv::VideoCapture cap;
+    cv::Mat frame_;
+    cv::VideoCapture cap_;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr img_publisher_;
-    int command;
-    int camera_idx;
+    rclcpp::Service<qbot_nodes_cpp::srv::CameraCommand>::SharedPtr service_;
+    int command_;
+    int camera_idx_;
 };
 
 int main(int argc, char *argv[])

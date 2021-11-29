@@ -81,7 +81,9 @@ target_include_directories(base_controller PUBLIC
 add_executable(local_planner src/local_planner.cpp)
 ament_target_dependencies(local_planner 
   rclcpp
-  geometry_msgs)
+  geometry_msgs
+  sensor_msgs
+	OpenCV)
 target_include_directories(local_planner PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)

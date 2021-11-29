@@ -6,8 +6,11 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "qbot_nodes_cpp/srv/heading_speed.hpp"
+#include "camera_interface_header.hpp"
 
 using namespace std::chrono_literals;
+
+using std::placeholders::_1;
 
 class LocalPlanner : public rclcpp::Node
 {
@@ -15,6 +18,7 @@ public:
     LocalPlanner()
     : Node("local_planner")
     {
+        count_ = 0;
         publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
         period_ = 500ms;
         period_mag_ = period_.count();
@@ -27,12 +31,12 @@ public:
         speed_ = 0.0;
         new_speed_ = speed_;
         speed_delta_ = 0.25;
-        cmd_vel_msg.linear.x = speed_;
-        cmd_vel_msg.linear.y = 0.0;
-        cmd_vel_msg.linear.z = 0.0;
-        cmd_vel_msg.angular.x = 0.0;
-        cmd_vel_msg.angular.y = 0.0;
-        cmd_vel_msg.angular.z = omega_;
+        cmd_vel_msg_.linear.x = speed_;
+        cmd_vel_msg_.linear.y = 0.0;
+        cmd_vel_msg_.linear.z = 0.0;
+        cmd_vel_msg_.angular.x = 0.0;
+        cmd_vel_msg_.angular.y = 0.0;
+        cmd_vel_msg_.angular.z = omega_;
         //
         // use lambda expression to handle service callback
         // to avoid using std::bind, which is messy for sevice callbacks
@@ -52,6 +56,11 @@ public:
             response = 0;
         };
         service_ = create_service<qbot_nodes_cpp::srv::HeadingSpeed>("set_heading_speed", handle_set_heading_speed);
+        //
+        // subscribe to image published by camera node
+        //
+        subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
+        "uvc_camera/image", 10, std::bind(&LocalPlanner::img_subscriber_callback, this, _1));
     }
 
 private:
@@ -85,16 +94,40 @@ private:
             omega_ = 0.0;
         }
         RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", heading_, speed_);
-        cmd_vel_msg.linear.x = speed_;
-        RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg.linear.x);
-        cmd_vel_msg.angular.z = omega_;
-        RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg.angular.z);
-        publisher_->publish(cmd_vel_msg);
+        cmd_vel_msg_.linear.x = speed_;
+        RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg_.linear.x);
+        cmd_vel_msg_.angular.z = omega_;
+        RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg_.angular.z);
+        publisher_->publish(cmd_vel_msg_);
     }
+
+    void img_subscriber_callback(const sensor_msgs::msg::Image::SharedPtr img_ptr)
+    {
+        RCLCPP_INFO_STREAM(this->get_logger(), "\n\nsubscriber count_: " << count_ << "\n");
+        ++count_;
+        int rows = img_ptr->height;
+        int cols = img_ptr->width;
+        int type = CV_8UC3;
+        cv::Mat image(rows, cols, type, &img_ptr->data[0]);
+        if (count_ == 5) {
+            count_ = 0;
+            compute_heading(image);
+        }
+    }
+
+    void compute_heading(cv::Mat image)
+    {
+        RCLCPP_INFO_STREAM(this->get_logger(), "rows: " << image.rows);
+        RCLCPP_INFO_STREAM(this->get_logger(), "cols: " << image.cols);
+        std::string homedir = getenv("HOME");
+        cv::imwrite(homedir + "/Pictures/saved_image.jpg", image);
+    }
+
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
-    geometry_msgs::msg::Twist cmd_vel_msg;
+    geometry_msgs::msg::Twist cmd_vel_msg_;
     rclcpp::Service<qbot_nodes_cpp::srv::HeadingSpeed>::SharedPtr service_;
+    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
     double heading_;
     double new_heading_;
     double omega_;
@@ -104,6 +137,7 @@ private:
     double speed_delta_;
     std::chrono::milliseconds period_;
     unsigned int period_mag_;
+    int count_;
 };
 
 int main(int argc, char * argv[])
