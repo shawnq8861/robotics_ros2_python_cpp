@@ -13,7 +13,7 @@ def main():
     #
     # address of the RoboClaw as set in Motion Studio
     #
-    address = b'\x80'
+    address = bytes(0x80)
     #
     # Creating the RoboClaw object, serial port and baudrate passed
     #
@@ -26,7 +26,7 @@ def main():
         #
         # Start motor 1 in the forward direction at half speed
         #
-        counts = robo.ReadEncM1(str.encode('80'))
+        counts = robo.ReadEncM1(address)
         print("motor 1 counts: ", counts)
         time.sleep(1.0)
     else:
