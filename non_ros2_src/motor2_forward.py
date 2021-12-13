@@ -46,7 +46,7 @@ def main():
             #
             # stop the motor
             #
-            robo.ForwardM1(address, 0)
+            robo.ForwardM2(address, 0)
         else:
             print("port did not open")
 
