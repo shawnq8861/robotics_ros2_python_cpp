@@ -29,7 +29,8 @@ def main():
         #
         counts = robo.ReadEncM1(address)
         print("motor 1 counts: ", counts)
-        time.sleep(1.0)
+        m1_count = counts[1]
+        print("motor 1 count: ", m1_count)
     else:
         print("port did not open")
 
