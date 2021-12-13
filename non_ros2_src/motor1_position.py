@@ -4,7 +4,7 @@
 # 
 #
 import sys
-from roboclaw import Roboclaw
+from roboclaw import Roboclaw_3
 import time
 
 def main():
@@ -13,7 +13,7 @@ def main():
     #
     # address of the RoboClaw as set in Motion Studio
     #
-    address = bytes('0x80', 'utf-8')
+    address = 0x80
     print(address)
     #
     # Creating the RoboClaw object, serial port and baudrate passed
