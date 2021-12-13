@@ -13,7 +13,8 @@ def main():
     #
     # address of the RoboClaw as set in Motion Studio
     #
-    address = bytes(0x80)
+    address = bytes('0x80', 'utf-8')
+    print(address)
     #
     # Creating the RoboClaw object, serial port and baudrate passed
     #
