@@ -26,7 +26,7 @@ def main():
         #
         # Start motor 1 in the forward direction at half speed
         #
-        counts = robo.ReadEncM1('\x80')
+        counts = robo.ReadEncM1(b'\x80')
         print("motor 1 counts: ", counts)
         time.sleep(1.0)
     else:
