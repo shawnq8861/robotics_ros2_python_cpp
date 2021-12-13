@@ -39,7 +39,7 @@ def main():
             # Start motor 1 in the forward direction at half speed
             #
             #robo.ForwardM1(address, speed.to_bytes(1))
-            robo.ForwardM1(address, 30)
+            robo.ForwardM1(address, speed.to_bytes(1, 'big'))
             #
             # pause for three seconds
             #
