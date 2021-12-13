@@ -21,7 +21,7 @@ def main():
     # get the move speed, must be between 0 and 127
     #
     else:
-        counts = int(sys.argv[1])
+        speed = int(sys.argv[1])
         #
         # address of the RoboClaw as set in Motion Studio
         #
@@ -29,7 +29,7 @@ def main():
         #
         # Creating the RoboClaw object, serial port and baudrate passed
         #
-        robo = Roboclaw("/dev/ttymxc2", 9600) 
+        robo = Roboclaw("/dev/ttymxc2", 38400) 
         #
         # Starting communication with the RoboClaw hardware
         #
@@ -38,7 +38,7 @@ def main():
             #
             # Start motor 1 in the forward direction at half speed
             #
-            robo.ForwardM1(address, counts)
+            robo.ForwardM1(address, speed)
             #
             # pause for three seconds
             #
