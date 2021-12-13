@@ -38,7 +38,7 @@ def main():
             #
             # Start motor 1 in the forward direction at half speed
             #
-            robo.ForwardM1(address, speed)
+            robo.ForwardM2(address, speed)
             #
             # pause for two seconds
             #
