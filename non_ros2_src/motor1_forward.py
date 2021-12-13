@@ -4,7 +4,7 @@
 # 
 #
 import sys
-from roboclaw import Roboclaw
+from roboclaw_3 import Roboclaw
 import time
 
 def main():
@@ -38,8 +38,8 @@ def main():
             #
             # Start motor 1 in the forward direction at half speed
             #
-            #robo.ForwardM1(address, speed.to_bytes(1))
-            robo.ForwardM1(address, speed.to_bytes(1, 'big'))
+            robo.ForwardM1(address, speed)
+            #robo.ForwardM1(address, speed.to_bytes(1, 'big'))
             #
             # pause for three seconds
             #
