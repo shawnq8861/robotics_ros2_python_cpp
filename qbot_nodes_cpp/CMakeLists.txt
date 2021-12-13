@@ -23,7 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-#find_package(cv_bridge)
+find_package(serial REQUIRED)
 
 #
 # need the following to enable building custom services
@@ -56,7 +56,6 @@ ament_target_dependencies(uvc_camera
 	std_msgs
 	sensor_msgs
 	OpenCV)
-  #cv_bridge)
 target_include_directories(uvc_camera PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -83,7 +82,7 @@ ament_target_dependencies(local_planner
   rclcpp
   geometry_msgs
   sensor_msgs
-	OpenCV)
+  OpenCV)
 target_include_directories(local_planner PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -92,7 +91,8 @@ add_executable(motor_encoder_tests src/motor_encoder_tests.cpp)
 ament_target_dependencies(motor_encoder_tests 
 	rclcpp 
 	std_msgs
-	sensor_msgs)
+	sensor_msgs
+	serial)
 target_include_directories(motor_encoder_tests PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -121,6 +121,7 @@ install(
   DIRECTORY src launch rviz urdf meshes
   DESTINATION share/${PROJECT_NAME}
 )
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

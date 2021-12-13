@@ -4,9 +4,11 @@
 #include <sched.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <vector>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "serial/serial.h"
 
 static constexpr int node_priority = 98;
 
@@ -22,6 +24,22 @@ private:
     size_t count_;
 
 };
+
+void enumerate_ports()
+{
+	std::vector<serial::PortInfo> devices_found = serial::list_ports();
+
+	std::vector<serial::PortInfo>::iterator iter = devices_found.begin();
+
+	while( iter != devices_found.end() )
+	{
+		serial::PortInfo device = *iter++;
+
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "port: " << device.port.c_str()
+                            << " description: " << device.description.c_str()
+                            << " hardware_id: " << device.hardware_id.c_str());
+	}
+}
 
 int main(int argc, char * argv[])
 {
@@ -55,7 +73,7 @@ int main(int argc, char * argv[])
 
     // Do stuff here......
     RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor and encoder tests... ");
-
+    enumerate_ports();
     //
     // unlock memory before teardown
     //
