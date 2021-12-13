@@ -4,7 +4,7 @@
 # 
 #
 import sys
-from roboclaw import Roboclaw_3
+from roboclaw_3 import Roboclaw_3
 import time
 
 def main():
