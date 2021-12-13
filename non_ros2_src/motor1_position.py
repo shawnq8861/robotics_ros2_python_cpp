@@ -18,7 +18,7 @@ def main():
     #
     # Creating the RoboClaw object, serial port and baudrate passed
     #
-    robo = Roboclaw("/dev/ttymxc2", 9600) 
+    robo = Roboclaw("/dev/ttymxc2", 38400) 
     #
     # Starting communication with the RoboClaw hardware
     #
