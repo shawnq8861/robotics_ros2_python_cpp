@@ -84,10 +84,13 @@ int main(int argc, char * argv[])
     serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
 
     std::cout << "Is the serial port open?";
-    if(my_serial.isOpen())
+    if(my_serial.isOpen()) {
         std::cout << " Yes." << std::endl;
-    else
+        my_serial.close();
+    }
+    else {
         std::cout << " No." << std::endl;
+    }
     //
     // unlock memory before teardown
     //
