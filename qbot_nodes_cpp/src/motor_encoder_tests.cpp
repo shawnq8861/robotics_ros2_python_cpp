@@ -10,7 +10,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "serial/serial.h"
 
-static constexpr int node_priority = 98;
+static constexpr int node_priority = 97;
 
 class MotorEncoderTest : public rclcpp::Node
 {
@@ -74,6 +74,20 @@ int main(int argc, char * argv[])
     // Do stuff here......
     RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor and encoder tests... ");
     enumerate_ports();
+    //
+    // try to open a port
+    //
+    // port, baudrate, timeout in milliseconds
+    std::string port("/dev/ttymxc2");
+    std::cout << "port: " << port << std::endl;
+    unsigned long baud = 38400;
+    serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
+
+    std::cout << "Is the serial port open?";
+    if(my_serial.isOpen())
+        std::cout << " Yes." << std::endl;
+    else
+        std::cout << " No." << std::endl;
     //
     // unlock memory before teardown
     //
