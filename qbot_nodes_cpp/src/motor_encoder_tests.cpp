@@ -8,7 +8,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "serial/serial.h"
+//#include "serial/serial.h"
+#include "roboclaw.hpp"
 
 static constexpr int node_priority = 97;
 
@@ -73,7 +74,6 @@ int main(int argc, char * argv[])
 
     // Do stuff here......
     RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor and encoder tests... ");
-    enumerate_ports();
     //
     // try to open a port
     //
@@ -82,7 +82,6 @@ int main(int argc, char * argv[])
     std::cout << "port: " << port << std::endl;
     unsigned long baud = 38400;
     serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
-
     std::cout << "Is the serial port open?";
     if(my_serial.isOpen()) {
         std::cout << " Yes." << std::endl;
@@ -91,6 +90,14 @@ int main(int argc, char * argv[])
     else {
         std::cout << " No." << std::endl;
     }
+    Roboclaw robo = Roboclaw(port, baud);
+    uint8_t address = 0x80;
+    uint8_t status = 0;
+    bool valid = false;
+    uint32_t motor1_position = -1;
+    motor1_position = robo.ReadEncM1(address, &status, &valid);
+    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
+
     //
     // unlock memory before teardown
     //
