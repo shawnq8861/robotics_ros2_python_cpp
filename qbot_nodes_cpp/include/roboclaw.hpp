@@ -14,6 +14,13 @@
 
 #include <serial/serial.h>
 
+/*
+ * Macros taken directly from Arduino Library
+ */
+#define MAXRETRY 2
+#define SetDWORDval(arg) (uint8_t)(((uint32_t)arg)>>24),(uint8_t)(((uint32_t)arg)>>16),(uint8_t)(((uint32_t)arg)>>8),(uint8_t)arg
+#define SetWORDval(arg) (uint8_t)(((uint16_t)arg)>>8),(uint8_t)arg
+
 class Roboclaw
 {
 	public:
@@ -310,4 +317,160 @@ class Roboclaw
 				FLAGBOOTLOADER = 255 /* only available via USB communications */
 		};
 };
+
+/*
+ * Constructor opens port at desired baudrate
+ */
+Roboclaw::Roboclaw(std::string &port, uint32_t baudrate)
+{
+    /* initialize pointer to a new Serial port object */
+    port_ = new serial::Serial(port, baudrate, serial::Timeout::simpleTimeout(100));
+    port_->open();
+}
+
+/*
+ * Destructor closes serial port and frees the associated memory
+ */
+Roboclaw::~Roboclaw()
+{
+    port_->close();
+    delete port_;
+}
+
+/*
+ * writes a single byte to the serial port
+ */
+void Roboclaw::write(uint8_t byte)
+{
+    port_->write(&byte, 1);
+}
+
+/*
+ * reads and returns a single byte from the serial port or -1 in error or timeout
+ * returns an int16_t to be consistent with the Arduino library and allow for
+ *       returning -1 error
+ */
+int16_t Roboclaw::read()
+{
+    uint8_t buff[1];
+    if (port_->read(buff, 1) == 1)
+    {
+        return buff[0];
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+/*
+ * flushes the serial port's input and output buffers
+ */
+void Roboclaw::flush()
+{
+    port_->flush();
+}
+
+/*
+ * resets the crc calculation
+ */
+void Roboclaw::crc_clear()
+{
+    crc_ = 0;
+}
+
+/*
+ * updates the crc calculation with based on the specified byte
+ * see the Roboclaw sheet and user manual for more on this 
+ */
+void Roboclaw::crc_update (uint8_t data)
+{
+    int i;
+    crc_ = crc_^ ((uint16_t)data << 8);
+    for (i=0; i<8; i++)
+    {
+        if (crc_ & 0x8000)
+            crc_ = (crc_ << 1) ^ 0x1021;
+        else
+            crc_ <<= 1;
+    }
+}
+
+/*
+ * returns the current value of the crc
+ * this is not necessary as private methods can directly access the crc_ attribute,
+ *      but it is being kept for now to keep the original Arduino code intact
+ */
+uint16_t Roboclaw::crc_get()
+{
+    return crc_;
+}
+
+/*
+ * Reads a four byte register along with the roboclaw's status
+ * returns the value of the register or false in the event of a timeout or error
+ * updates value of status pointer argument
+ * indicates success/failure through the valid argument
+ */
+uint32_t Roboclaw::read4_1(uint8_t address, uint8_t cmd, uint8_t *status, bool *valid)
+{
+    if(valid)
+        *valid = false;
+
+    //
+    // set status = NULL until we figure how to assign a value to it
+    //
+    if (status == nullptr){
+        status = nullptr;
+    }
+
+    uint16_t value=0;
+    uint8_t trys=MAXRETRY;
+    int16_t data;
+    do{
+        flush();
+
+        crc_clear();
+        write(address);
+        crc_update(address);
+        write(cmd);
+        crc_update(cmd);
+
+        data = read();
+        crc_update(data);
+        value=(uint16_t)data<<8;
+
+        if(data!=-1){
+            data = read();
+            crc_update(data);
+            value|=(uint16_t)data;
+        }
+
+        if(data!=-1){
+            uint16_t ccrc;
+            data = read();
+            if(data!=-1){
+                ccrc = data << 8;
+                data = read();
+                if(data!=-1){
+                    ccrc |= data;
+                    if(crc_get()==ccrc){
+                        *valid = true;
+                        return value;
+                    }
+                }
+            }
+        }
+    }while(trys--);
+
+    return false;
+}
+
+//
+// start with this one, build it up and test it
+//
+uint32_t Roboclaw::ReadEncM1(uint8_t address, uint8_t *status,bool *valid){
+    return read4_1(address,GETM1ENC,status,valid);
+}
+
 #endif
