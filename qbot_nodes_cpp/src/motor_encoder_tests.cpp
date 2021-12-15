@@ -79,17 +79,17 @@ int main(int argc, char * argv[])
     //
     // port, baudrate, timeout in milliseconds
     std::string port("/dev/ttymxc2");
-    std::cout << "port: " << port << std::endl;
+    //std::cout << "port: " << port << std::endl;
     unsigned long baud = 38400;
-    serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
-    std::cout << "Is the serial port open?";
-    if(my_serial.isOpen()) {
-        std::cout << " Yes." << std::endl;
-        my_serial.close();
-    }
-    else {
-        std::cout << " No." << std::endl;
-    }
+    //serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
+    //std::cout << "Is the serial port open?";
+    //if(my_serial.isOpen()) {
+    //    std::cout << " Yes." << std::endl;
+    //    my_serial.close();
+    //}
+    //else {
+    //    std::cout << " No." << std::endl;
+    //}
     Roboclaw robo = Roboclaw(port, baud);
     uint8_t address = 0x80;
     uint8_t status = 0;
