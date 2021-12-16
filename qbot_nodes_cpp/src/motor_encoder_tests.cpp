@@ -94,11 +94,16 @@ int main(int argc, char * argv[])
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " Yes. open, testing...\n\n");
         Roboclaw robo = Roboclaw(&my_serial);
         uint8_t address = 0x80;
-        uint8_t status = 0;
-        bool valid = false;
-        uint32_t motor1_position = -1;
-        motor1_position = robo.ReadEncM1(address, &status, &valid);
-        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
+        //uint8_t status = 0;
+        //bool valid = false;
+        my_serial.write(&address, 1);
+        uint8_t command = 16;
+        my_serial.write(&command, 1);
+        //uint32_t motor1_position = -1;
+        auto ret_value = my_serial.read();
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "return value:  " << ret_value);
+        //motor1_position = robo.ReadEncM1(address, &status, &valid);
+        //RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
         my_serial.close();
     }
     else {
