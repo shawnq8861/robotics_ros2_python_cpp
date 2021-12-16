@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
     //
     std::string port("/dev/ttymxc2");
     unsigned long baud = 38400;
-    serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
+    serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1));
     //
     // lock memory to prevent paging after instantiations are complete
     //
