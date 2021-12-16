@@ -92,43 +92,22 @@ int main(int argc, char * argv[])
     RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "Is the serial port open?");
     if(my_serial.isOpen()) {
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " Yes. open, testing...\n\n");
-
-        // Test the timeout, there should be 1 second between prints
-        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "Timeout == 1000ms, asking for 1 more byte than written.");
-        int count = 0;
-        std::string test_string("Testing.");
-        while (count < 10) {
-            size_t bytes_wrote = my_serial.write(test_string);
-
-            std::string result = my_serial.read(test_string.length()+1);
-
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(),"Iteration: " << count);
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), ", Bytes written: " << bytes_wrote);
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), ", Bytes read: " << result.length());
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), ", String read: " << result);
-
-            count += 1;
-        }
-
+        Roboclaw robo = Roboclaw(&my_serial);
+        uint8_t address = 0x80;
+        uint8_t status = 0;
+        bool valid = false;
+        uint32_t motor1_position = -1;
+        motor1_position = robo.ReadEncM1(address, &status, &valid);
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
         my_serial.close();
     }
     else {
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " No.");
-    }
-    //Roboclaw robo = Roboclaw(port, baud);
-    //uint8_t address = 0x80;
-    //uint8_t status = 0;
-    //bool valid = false;
-    //uint32_t motor1_position = -1;
-    //motor1_position = robo.ReadEncM1(address, &status, &valid);
-    //RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
-
+    }   
     //
     // unlock memory before teardown
     //
     munlockall();
-    
-
     rclcpp::shutdown();
     return 0;
 }
