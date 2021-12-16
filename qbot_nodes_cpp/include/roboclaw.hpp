@@ -27,8 +27,8 @@ class Roboclaw
         /*
          * initializes serial port with specified file and baudrate
          */
-		Roboclaw(std::string &port, uint32_t baudrate);	/* ack option only available on 3.1.8 and newer firmware */
-
+		//Roboclaw(std::string &port, uint32_t baudrate);	/* ack option only available on 3.1.8 and newer firmware */
+		Roboclaw(serial::Serial *port);
         /*
          * closes serial port and frees the associated memory
          */
@@ -212,7 +212,7 @@ class Roboclaw
         /* 
          * pointer to the serial port used for communication with the roboclaw 
          */
-        serial::Serial * port_;
+        serial::Serial *port_;
 
         /* 
          * tracks and update the crc calculation 
@@ -321,11 +321,13 @@ class Roboclaw
 /*
  * Constructor opens port at desired baudrate
  */
-Roboclaw::Roboclaw(std::string &port, uint32_t baudrate)
+//Roboclaw::Roboclaw(std::string &port, uint32_t baudrate)
+Roboclaw::Roboclaw(serial::Serial *port)
 {
     /* initialize pointer to a new Serial port object */
-    port_ = new serial::Serial(port, baudrate, serial::Timeout::simpleTimeout(100));
-    port_->open();
+    //port_ = new serial::Serial(port, baudrate, serial::Timeout::simpleTimeout(100));
+    //port_->open();
+	port_ = port;
 }
 
 /*
@@ -334,7 +336,7 @@ Roboclaw::Roboclaw(std::string &port, uint32_t baudrate)
 Roboclaw::~Roboclaw()
 {
     port_->close();
-    delete port_;
+    //delete port_;
 }
 
 /*
