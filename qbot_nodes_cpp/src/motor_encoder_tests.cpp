@@ -8,7 +8,6 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-//#include "serial/serial.h"
 #include "roboclaw.hpp"
 
 static constexpr int node_priority = 97;
@@ -79,24 +78,23 @@ int main(int argc, char * argv[])
     //
     // port, baudrate, timeout in milliseconds
     std::string port("/dev/ttymxc2");
-    //std::cout << "port: " << port << std::endl;
     unsigned long baud = 38400;
-    //serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
-    //std::cout << "Is the serial port open?";
-    //if(my_serial.isOpen()) {
-    //    std::cout << " Yes." << std::endl;
-    //    my_serial.close();
-    //}
-    //else {
-    //    std::cout << " No." << std::endl;
-    //}
-    Roboclaw robo = Roboclaw(port, baud);
-    uint8_t address = 0x80;
-    uint8_t status = 0;
-    bool valid = false;
-    uint32_t motor1_position = -1;
-    motor1_position = robo.ReadEncM1(address, &status, &valid);
-    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
+    serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
+    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "Is the serial port open?");
+    if(my_serial.isOpen()) {
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " Yes.");
+        my_serial.close();
+    }
+    else {
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " No.");
+    }
+    //Roboclaw robo = Roboclaw(port, baud);
+    //uint8_t address = 0x80;
+    //uint8_t status = 0;
+    //bool valid = false;
+    //uint32_t motor1_position = -1;
+    //motor1_position = robo.ReadEncM1(address, &status, &valid);
+    //RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
 
     //
     // unlock memory before teardown
