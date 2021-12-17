@@ -23,7 +23,6 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-find_package(serial REQUIRED)
 
 #
 # need the following to enable building custom services
@@ -91,8 +90,7 @@ add_executable(motor_encoder_tests src/motor_encoder_tests.cpp)
 ament_target_dependencies(motor_encoder_tests 
 	rclcpp 
 	std_msgs
-	sensor_msgs
-	serial)
+	sensor_msgs)
 target_include_directories(motor_encoder_tests PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
