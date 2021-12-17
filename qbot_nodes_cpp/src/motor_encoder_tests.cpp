@@ -57,12 +57,45 @@ int main(int argc, char * argv[])
     // port, baudrate, timeout in milliseconds
     //
     std::string port("/dev/ttymxc2");
-    unsigned long baud = 38400;
+    //unsigned long baud = 38400;
+    int baudrate = 38400;
     //serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1));
-    //
-    // lock memory to prevent paging after instantiations are complete
-    //
-    mlockall(MCL_CURRENT | MCL_FUTURE);
+
+    //initialize at supplied terminal at specified baudrate
+    struct roboclaw *robo;
+	robo = roboclaw_init(port.c_str(), baudrate);
+    if (robo == nullptr) {
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "unable to instantiate roboclaw object...\n");
+    }
+    else {
+        uint8_t address = 0x80;
+        int32_t enc_m1;
+        int32_t enc_m2;
+        //
+        // lock memory to prevent paging after instantiations are complete
+        //
+        mlockall(MCL_CURRENT | MCL_FUTURE);
+        //
+        // read encoders (swiich to running in a ROS loop later on)
+        //
+        if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+            //printf("could not read encoder values...\n");
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
+        }
+        else {
+            //printf("enc m1: %d\n", enc_m1);
+            //printf("enc m2: %d\n", enc_m2);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
+        }
+        //
+        // unlock memory before teardown
+        //
+        munlockall();
+    }
+    
+
+
     //
     // check if the serial port is open
     //
@@ -85,11 +118,11 @@ int main(int argc, char * argv[])
     //}
     //else {
     //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " No.");
-    //}   
-    //
-    // unlock memory before teardown
-    //
-    munlockall();
+    //}
+
+
+
+    
     rclcpp::shutdown();
     return 0;
 }
