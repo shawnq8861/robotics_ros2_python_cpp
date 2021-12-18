@@ -37,7 +37,9 @@ int main(int argc, char * argv[])
     //
     int rc = -1;
 	struct sched_param my_params;
+    //
 	// Passing zero specifies caller’s (our) policy
+    //
 	my_params.sched_priority = node_priority;
     //
 	// Passing zero specifies callers (our) pid
@@ -57,11 +59,10 @@ int main(int argc, char * argv[])
     // port, baudrate, timeout in milliseconds
     //
     std::string port("/dev/ttymxc2");
-    //unsigned long baud = 38400;
     int baudrate = 38400;
-    //serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1));
-
-    //initialize at supplied terminal at specified baudrate
+    //
+    //initialize at roboclaw object
+    //
     struct roboclaw *robo;
 	robo = roboclaw_init(port.c_str(), baudrate);
     if (robo == nullptr) {
@@ -79,12 +80,9 @@ int main(int argc, char * argv[])
         // read encoders (swiich to running in a ROS loop later on)
         //
         if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
-            //printf("could not read encoder values...\n");
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
         }
         else {
-            //printf("enc m1: %d\n", enc_m1);
-            //printf("enc m2: %d\n", enc_m2);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
@@ -93,35 +91,6 @@ int main(int argc, char * argv[])
         //
         munlockall();
     }
-    
-
-
-    //
-    // check if the serial port is open
-    //
-    //RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "Is the serial port open?");
-    //if(my_serial.isOpen()) {
-    //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " Yes. open, testing...\n\n");
-    //    Roboclaw robo = Roboclaw(&my_serial);
-    //    uint8_t address = 0x80;
-    //    uint8_t status = 0;
-    //    bool valid = false;
-    //    my_serial.write(&address, 1);
-    //    uint8_t command = 16;
-    //    my_serial.write(&command, 1);
-    //    uint32_t motor1_position = -1;
-    //    auto ret_value = my_serial.read();
-    //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "return value:  " << ret_value);
-    //    motor1_position = robo.ReadEncM1(address, &status, &valid);
-    //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor1 position:  " << motor1_position);
-    //    my_serial.close();
-    //}
-    //else {
-    //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), " No.");
-    //}
-
-
-
     
     rclcpp::shutdown();
     return 0;
