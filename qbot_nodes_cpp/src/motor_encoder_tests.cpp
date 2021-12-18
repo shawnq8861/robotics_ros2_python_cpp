@@ -76,6 +76,8 @@ int main(int argc, char * argv[])
         uint8_t address = 0x80;
         int32_t enc_m1;
         int32_t enc_m2;
+        int speed_m1 = 30;
+        int speed_m2 = 21;
         //
         // lock memory to prevent paging after instantiations are complete
         //
@@ -90,9 +92,17 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
-        //const std::chrono::nanoseconds dur = std::chrono::nanoseconds(2s);
-        //rclcpp::utilities::sleep_for(dur);
+        //
+        // move the motors
+        //
+        roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2);
         std::this_thread::sleep_for(2s);
+        speed_m1 = 0;
+        speed_m2 = 0;
+        roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2);
+        //
+        // read encoders to verify movement
+        //
         if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
         }
