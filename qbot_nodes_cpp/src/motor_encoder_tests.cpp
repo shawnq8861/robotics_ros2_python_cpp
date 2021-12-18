@@ -5,12 +5,16 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <vector>
+#include <thread>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/utilities.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "roboclaw.hpp"
 
 static constexpr int node_priority = 97;
+
+using namespace std::chrono_literals;
 
 class MotorEncoderTest : public rclcpp::Node
 {
@@ -79,6 +83,16 @@ int main(int argc, char * argv[])
         //
         // read encoders (swiich to running in a ROS loop later on)
         //
+        if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
+        }
+        //const std::chrono::nanoseconds dur = std::chrono::nanoseconds(2s);
+        //rclcpp::utilities::sleep_for(dur);
+        std::this_thread::sleep_for(2s);
         if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
         }
