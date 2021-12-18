@@ -95,24 +95,24 @@ int main(int argc, char * argv[])
         //
         // move the motors
         //
-        //if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        //}
+        if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        }
         std::this_thread::sleep_for(2s);
         speed_m1 = 0;
         speed_m2 = 0;
         //
         // stop the motors
         //
-        //if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        //}
+        if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        }
         //
         // read encoders to verify movement
         //
