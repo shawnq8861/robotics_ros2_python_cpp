@@ -104,13 +104,12 @@ int main(int argc, char * argv[])
         //
         // move the motors
         //       
-		//if(roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2) != ROBOCLAW_OK ) {
-		//	RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor duty cycle...\n");		
-		//}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor duty cycle successfully...\n");
-        //}			
-
+		if(roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2) != ROBOCLAW_OK ) {
+			RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor duty cycle...\n");		
+		}
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor duty cycle successfully...\n");
+        }			
         //
         // unlock memory before teardown
         //
