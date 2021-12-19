@@ -510,6 +510,15 @@ static int encode_speed_accel_m1m2(uint8_t* buffer, uint8_t address, int32_t spe
 	return bytes;
 }
 
+static int encode_read_encoder_1(uint8_t *buffer, uint8_t address, uint16_t *cmd_crc16)
+{
+	uint8_t bytes=0;
+	buffer[bytes++]=address;
+	buffer[bytes++]=GETM1ENC;
+	*cmd_crc16 = calculate_crc16(buffer, bytes);
+	return bytes;	
+}
+
 static int encode_read_encoders(uint8_t *buffer, uint8_t address, uint16_t *cmd_crc16)
 {
 	uint8_t bytes=0;
@@ -518,6 +527,12 @@ static int encode_read_encoders(uint8_t *buffer, uint8_t address, uint16_t *cmd_
 	*cmd_crc16 = calculate_crc16(buffer, bytes);
 	return bytes;	
 }
+
+static void decode_read_encoder_1(uint8_t *buffer, int32_t *enc1)
+{
+	*enc1=decode_uint32_t(buffer);
+}
+
 
 static void decode_read_encoders(uint8_t *buffer, int32_t *enc1, int32_t *enc2)
 {
@@ -575,6 +590,22 @@ int roboclaw_encoders(struct roboclaw *rc, uint8_t address, int32_t *enc_m1, int
 	decode_read_encoders(rc->buffer+bytes, enc_m1, enc_m2);
 
 	return ROBOCLAW_OK;
+}
+
+int32_t ReadEncM1(struct roboclaw *rc, uint8_t address)
+{
+	int bytes, ret;
+	uint16_t sent_crc16;
+	int32_t enc_m1;
+	
+	bytes=encode_read_encoder_1(rc->buffer, address, &sent_crc16);
+
+	if( (ret=send_cmd_wait_answer(rc, bytes, ROBOCLAW_READ_ENCODERS_REPLY_BYTES, sent_crc16)) < 0 ) 
+		return ret; //IO error or retries exceeded
+		
+	decode_read_encoder_1(rc->buffer+bytes, &enc_m1);
+
+	return enc_m1;
 }
 
 #ifdef __cplusplus
