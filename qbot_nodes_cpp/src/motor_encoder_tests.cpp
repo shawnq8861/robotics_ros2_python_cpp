@@ -106,22 +106,21 @@ int main(int argc, char * argv[])
         //
         // read encoders to verify movement
         //
-        if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
-        }
-        else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
-        }
+        //if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
+        //}
+        //else {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
+        //}
+
         //
         // can't use a timer, the htread blocks, so use a for loop instead
         //
-        for (int64_t i = 0; i < INT64_MAX; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             //
             // do nothing
             //
-            speed_m1 = 0;
-            speed_m2 = 0;
         }
 
         //speed_m1 = 0;
