@@ -81,6 +81,7 @@ int main(int argc, char * argv[])
 
         int speed_m1 = 22;
         int speed_m2 = 11;
+        int accel = 50;
 
         //
         // lock memory to prevent paging after instantiations are complete
@@ -112,7 +113,7 @@ int main(int argc, char * argv[])
         //
         // move the motors
         //
-        if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
+        if (roboclaw_speed_accel_m1m2(robo, address, speed_m1, speed_m2, accel) != ROBOCLAW_OK) {
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
         }
         else {
@@ -142,11 +143,11 @@ int main(int argc, char * argv[])
         //
         // stop the motors
         //
-        if (roboclaw_speed_m1m2(robo, address, 0, 0) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        if (roboclaw_speed_accel_m1m2(robo, address, 0, 0, accel) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not stop motors...\n");
         }
         else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "stopped motors successfully...\n");
         }
 
         //
