@@ -87,9 +87,11 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
         }
         else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 count: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
+        int32_t m1_count = ReadEncM1(robo, address);
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor 1 enc count: " << m1_count);
         //
         // unlock memory before teardown
         //
