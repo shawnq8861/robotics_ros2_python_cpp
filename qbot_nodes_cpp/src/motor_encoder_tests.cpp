@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
 
         int speed_m1 = 22;
         int speed_m2 = 11;
-        int accel = 50;
+        int accel = 25;
 
         //
         // lock memory to prevent paging after instantiations are complete

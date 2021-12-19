@@ -94,6 +94,33 @@ ament_target_dependencies(motor_encoder_tests
 target_include_directories(motor_encoder_tests PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+  
+add_executable(motor_stop src/motor_stop.cpp)
+ament_target_dependencies(motor_stop 
+	rclcpp 
+	std_msgs
+	sensor_msgs)
+target_include_directories(motor_stop PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+add_executable(motor_start src/motor_start.cpp)
+ament_target_dependencies(motor_start 
+	rclcpp 
+	std_msgs
+	sensor_msgs)
+target_include_directories(motor_start PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+  
+add_executable(encoder_test src/encoder_test.cpp)
+ament_target_dependencies(encoder_test 
+	rclcpp 
+	std_msgs
+	sensor_msgs)
+target_include_directories(encoder_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 #
 # need the following to enable using the custon srv
@@ -112,6 +139,9 @@ install(TARGETS
   base_controller
   local_planner
   motor_encoder_tests
+  motor_stop
+  motor_start
+  encoder_test
   DESTINATION lib/${PROJECT_NAME}
 )
 
