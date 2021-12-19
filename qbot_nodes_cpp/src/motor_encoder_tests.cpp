@@ -122,7 +122,7 @@ int main(int argc, char * argv[])
         // can't use a timer, the htread blocks, so use a for loop instead
         //
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
-        for (int32_t i = 0; i < INT32_MAX; ++i) {
+        for (int32_t i = 0; i < INT32_MAX/100; ++i) {
             //
             // do nothing
             //
