@@ -79,8 +79,8 @@ int main(int argc, char * argv[])
 
         int32_t j = 0;
 
-        int speed_m1 = 30;
-        int speed_m2 = 21;
+        int speed_m1 = 22;
+        int speed_m2 = 11;
 
         //
         // lock memory to prevent paging after instantiations are complete
@@ -124,11 +124,14 @@ int main(int argc, char * argv[])
         //
         j = 0;
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
-        for (int32_t i = 0; i < INT32_MAX/20; ++i) {
+        for (int32_t i = 0; i < INT32_MAX/25; ++i) {
             //
             // do nothing
             //
             ++j;
+            if (j % 100 == 0) {
+                RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
+            }
         }
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
 
