@@ -76,8 +76,10 @@ int main(int argc, char * argv[])
         uint8_t address = 0x80;
         int32_t enc_m1;
         int32_t enc_m2;
-        int speed_m1 = 30;
-        int speed_m2 = 21;
+
+        //int speed_m1 = 30;
+        //int speed_m2 = 21;
+
         //
         // lock memory to prevent paging after instantiations are complete
         //
@@ -117,7 +119,7 @@ int main(int argc, char * argv[])
         //
         // can't use a timer, the htread blocks, so use a for loop instead
         //
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 1000000; ++i) {
             //
             // do nothing
             //
