@@ -79,8 +79,8 @@ int main(int argc, char * argv[])
 
         int32_t j = 0;
 
-        //int speed_m1 = 30;
-        //int speed_m2 = 21;
+        int speed_m1 = 30;
+        int speed_m2 = 21;
 
         //
         // lock memory to prevent paging after instantiations are complete
@@ -98,31 +98,10 @@ int main(int argc, char * argv[])
         }
 
         //
-        // move the motors
-        //
-        //if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        //}
-
-        //
-        // read encoders to verify movement
-        //
-        //if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
-        //}
-
-        //
-        // can't use a timer, the htread blocks, so use a for loop instead
+        // can't use a timer, the thread blocks, so use a for loop instead
         //
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
-        for (int32_t i = 0; i < INT32_MAX/25; ++i) {
+        for (int32_t i = 0; i < INT32_MAX/50; ++i) {
             //
             // do nothing
             //
@@ -130,18 +109,55 @@ int main(int argc, char * argv[])
         }
         RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
 
+        //
+        // move the motors
+        //
+        if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        }
+
+        //
+        // can't use a timer, the thread blocks, so use a for loop instead
+        //
+        j = 0;
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
+        for (int32_t i = 0; i < INT32_MAX/20; ++i) {
+            //
+            // do nothing
+            //
+            ++j;
+        }
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
+
+
         //speed_m1 = 0;
         //speed_m2 = 0;
 
         //
         // stop the motors
         //
-        //if (roboclaw_speed_m1m2(robo, address, 0, 0) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        //}
+        if (roboclaw_speed_m1m2(robo, address, 0, 0) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        }
+
+        //
+        // can't use a timer, the thread blocks, so use a for loop instead
+        //
+        j = 0;
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
+        for (int32_t i = 0; i < INT32_MAX/50; ++i) {
+            //
+            // do nothing
+            //
+            ++j;
+        }
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
 
         //
         // read encoders to verify movement
@@ -153,6 +169,7 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
+
         //
         // unlock memory before teardown
         //
