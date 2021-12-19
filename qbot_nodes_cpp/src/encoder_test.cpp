@@ -20,7 +20,7 @@ class MotorEncoderTest : public rclcpp::Node
 {
 public:
     MotorEncoderTest()
-    : Node("motor_encoder_tests"), count_(0)
+    : Node("encoder_test"), count_(0)
     {
     }
 
@@ -56,7 +56,7 @@ int main(int argc, char * argv[])
     else {
         std::cout << "changed scheduler policy" << std::endl;
     }
-    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor and encoder tests... ");
+    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder test... ");
     //
     // try to open a port
     //

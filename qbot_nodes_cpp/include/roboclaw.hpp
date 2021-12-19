@@ -419,17 +419,6 @@ static uint32_t decode_uint32_t(uint8_t *buffer)
 //
 // lower level functions used by top level functions
 //
-static int encode_speed_m1m2(uint8_t* buffer, uint8_t address, int32_t speed1, int32_t speed2)
-{
-	uint8_t bytes=0;
-	buffer[bytes++]=address;
-	buffer[bytes++]=MIXEDSPEED;
-	bytes += encode_uint32(buffer, bytes, speed1);
-	bytes += encode_uint32(buffer, bytes, speed2);
-	bytes += encode_checksum(buffer, bytes);
-	
-	return bytes;
-}
 
 // ROBOCLAW_ERROR (-1) on IO error (errno set), ROBOCLAW_RETRIES_EXCEEDED(-2) on exceeded retries, ROBOCLAW_OK (0) on success
 // send the `bytes_write` long command and wait until timeout for `bytes read` bytes reply
@@ -497,6 +486,31 @@ static int send_cmd_wait_answer(struct roboclaw *rc, int bytes_write, int bytes_
 	return ROBOCLAW_RETRIES_EXCEEDED;
 }
 
+static int encode_duty_m1m2(uint8_t *buffer, uint8_t address, int16_t duty1, int16_t duty2)
+{
+	uint8_t bytes=0;
+	buffer[bytes++]=address;
+	buffer[bytes++]=MIXEDDUTY;
+	bytes += encode_uint16(buffer, bytes, duty1);
+	bytes += encode_uint16(buffer, bytes, duty2);
+	bytes += encode_checksum(buffer, bytes);
+	
+	return bytes;
+}
+
+static int encode_speed_m1m2(uint8_t* buffer, uint8_t address, int32_t speed1, int32_t speed2)
+{
+	uint8_t bytes=0;
+	buffer[bytes++]=address;
+	buffer[bytes++]=MIXEDSPEED;
+	bytes += encode_uint32(buffer, bytes, speed1);
+	bytes += encode_uint32(buffer, bytes, speed2);
+	bytes += encode_checksum(buffer, bytes);
+	
+	return bytes;
+}
+
+
 static int encode_speed_accel_m1m2(uint8_t* buffer, uint8_t address, int32_t speed1, int32_t speed2, uint32_t accel)
 {
 	uint8_t bytes=0;
@@ -559,6 +573,11 @@ static void decode_read_encoders(uint8_t *buffer, int32_t *enc1, int32_t *enc2)
  */
 
 //int roboclaw_duty_m1m2(struct roboclaw *rc, uint8_t address, int16_t duty_m1, int16_t duty_m2);
+int roboclaw_duty_m1m2(struct roboclaw *rc, uint8_t address, int16_t duty_m1, int16_t duty_m2)
+{
+	int bytes=encode_duty_m1m2(rc->buffer, address, duty_m1, duty_m2);
+	return send_cmd_wait_answer(rc, bytes, ROBOCLAW_ACK_BYTES, 0);
+}
 
 
 int roboclaw_speed_m1m2(struct roboclaw *rc, uint8_t address, int speed_m1, int speed_m2)

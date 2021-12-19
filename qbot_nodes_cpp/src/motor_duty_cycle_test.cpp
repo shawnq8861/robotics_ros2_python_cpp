@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <memory>
 #include <string>
+#include <sstream>
 #include <sched.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -20,7 +21,7 @@ class MotorEncoderTest : public rclcpp::Node
 {
 public:
     MotorEncoderTest()
-    : Node("motor_stop"), count_(0)
+    : Node("motor_duty_cycle_test"), count_(0)
     {
     }
 
@@ -31,6 +32,13 @@ private:
 
 int main(int argc, char * argv[])
 {
+    //
+    // get duty cycle
+    //
+    std::stringstream duty_ss;
+    duty_ss << argv[1];
+    int duty_cycle;
+    duty_ss >> duty_cycle;
     rclcpp::init(argc, argv);
     //
     // create the node
@@ -56,7 +64,7 @@ int main(int argc, char * argv[])
     else {
         std::cout << "changed scheduler policy" << std::endl;
     }
-    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor stop... ");
+    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor duty cycle tests... ");
     //
     // try to open a port
     //
@@ -74,22 +82,35 @@ int main(int argc, char * argv[])
     }
     else {
         uint8_t address = 0x80;
-        int speed_m1 = 0;
-        int speed_m2 = 0;
-        int accel = 5;
         //
         // lock memory to prevent paging after instantiations are complete
         //
         mlockall(MCL_CURRENT | MCL_FUTURE);
         //
-        // stop the motors
+        // set the duty cycle
+        //			
+		if( duty_cycle > 25 ) {
+			duty_cycle = 25;
+        }	
+		if( duty_cycle < -25 ) {
+			duty_cycle = -25;
+        }
+		//	
+		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
-        if (roboclaw_speed_accel_m1m2(robo, address, speed_m1, speed_m2, accel) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not stop motors...\n");
-        }
-        else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "stopped motors successfully...\n");
-        }
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "duty cycle entered: " << duty_cycle);
+		duty_cycle = (float)duty_cycle/100.0f * 32767;
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "duty cycle converted: " << duty_cycle);
+        //
+        // move the motors
+        //       
+		//if(roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2) != ROBOCLAW_OK ) {
+		//	RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor duty cycle...\n");		
+		//}
+        //else {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor duty cycle successfully...\n");
+        //}			
+
         //
         // unlock memory before teardown
         //

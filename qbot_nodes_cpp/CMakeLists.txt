@@ -122,6 +122,15 @@ target_include_directories(encoder_test PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+add_executable(motor_duty_cycle_test src/motor_duty_cycle_test.cpp)
+ament_target_dependencies(motor_duty_cycle_test 
+	rclcpp 
+	std_msgs
+	sensor_msgs)
+target_include_directories(motor_duty_cycle_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 #
 # need the following to enable using the custon srv
 #
@@ -142,6 +151,7 @@ install(TARGETS
   motor_stop
   motor_start
   encoder_test
+  motor_duty_cycle_test
   DESTINATION lib/${PROJECT_NAME}
 )
 
