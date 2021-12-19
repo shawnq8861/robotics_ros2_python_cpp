@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
         int32_t enc_m1;
         int32_t enc_m2;
 
-        int j = 0;
+        int32_t j = 0;
 
         //int speed_m1 = 30;
         //int speed_m2 = 21;
@@ -121,12 +121,14 @@ int main(int argc, char * argv[])
         //
         // can't use a timer, the htread blocks, so use a for loop instead
         //
-        for (int i = 0; i < 1000000; ++i) {
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
+        for (int32_t i = 0; i < INT32_MAX; ++i) {
             //
             // do nothing
             //
             ++j;
         }
+        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "j: " << j);
 
         //speed_m1 = 0;
         //speed_m2 = 0;
