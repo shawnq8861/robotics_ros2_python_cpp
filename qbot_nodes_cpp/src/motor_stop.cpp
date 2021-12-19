@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
         uint8_t address = 0x80;
         int speed_m1 = 0;
         int speed_m2 = 0;
-        int accel = 25;
+        int accel = 5;
         //
         // lock memory to prevent paging after instantiations are complete
         //

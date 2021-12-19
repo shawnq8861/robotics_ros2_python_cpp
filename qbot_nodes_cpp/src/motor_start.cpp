@@ -74,9 +74,9 @@ int main(int argc, char * argv[])
     }
     else {
         uint8_t address = 0x80;
-        int speed_m1 = 22;
-        int speed_m2 = 11;
-        int accel = 25;
+        int speed_m1 = 10;
+        int speed_m2 = 5;
+        int accel = 5;
         //
         // lock memory to prevent paging after instantiations are complete
         //
