@@ -17,10 +17,10 @@ static constexpr int node_priority = 97;
 
 using namespace std::chrono_literals;
 
-class MotorEncoderTest : public rclcpp::Node
+class MotorDutyCycleTest : public rclcpp::Node
 {
 public:
-    MotorEncoderTest()
+    MotorDutyCycleTest()
     : Node("motor_duty_cycle_test"), count_(0)
     {
     }
@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
     //
     // create the node
     //
-    auto motor_encoder_test_node = std::make_shared<MotorEncoderTest>();
+    auto motor_encoder_test_node = std::make_shared<MotorDutyCycleTest>();
     //
     // use rt extensions
     //

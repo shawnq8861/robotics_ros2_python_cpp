@@ -16,10 +16,10 @@ static constexpr int node_priority = 97;
 
 using namespace std::chrono_literals;
 
-class MotorEncoderTest : public rclcpp::Node
+class EncoderTest : public rclcpp::Node
 {
 public:
-    MotorEncoderTest()
+    EncoderTest()
     : Node("encoder_test"), count_(0)
     {
     }
@@ -35,7 +35,7 @@ int main(int argc, char * argv[])
     //
     // create the node
     //
-    auto motor_encoder_test_node = std::make_shared<MotorEncoderTest>();
+    auto motor_encoder_test_node = std::make_shared<EncoderTest>();
     //
     // use rt extensions
     //
@@ -90,8 +90,6 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 count: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
-        int32_t m1_count = ReadEncM1(robo, address);
-        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "motor 1 enc count: " << m1_count);
         //
         // unlock memory before teardown
         //
