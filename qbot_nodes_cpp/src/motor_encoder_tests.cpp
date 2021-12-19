@@ -116,8 +116,12 @@ int main(int argc, char * argv[])
         //
         // can't use a timer, the htread blocks, so use a for loop instead
         //
-        for (int i = 0; i < INT64_MAX; ++i) {
-            continue;
+        for (int64_t i = 0; i < INT64_MAX; ++i) {
+            //
+            // do nothing
+            //
+            speed_m1 = 0;
+            speed_m2 = 0;
         }
 
         //speed_m1 = 0;
