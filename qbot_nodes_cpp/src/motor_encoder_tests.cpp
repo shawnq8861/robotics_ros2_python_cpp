@@ -77,6 +77,8 @@ int main(int argc, char * argv[])
         int32_t enc_m1;
         int32_t enc_m2;
 
+        int j = 0;
+
         //int speed_m1 = 30;
         //int speed_m2 = 21;
 
@@ -123,6 +125,7 @@ int main(int argc, char * argv[])
             //
             // do nothing
             //
+            ++j;
         }
 
         //speed_m1 = 0;
