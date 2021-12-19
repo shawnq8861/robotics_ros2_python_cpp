@@ -530,7 +530,8 @@ static int encode_read_encoders(uint8_t *buffer, uint8_t address, uint16_t *cmd_
 
 static void decode_read_encoder_1(uint8_t *buffer, int32_t *enc1)
 {
-	*enc1=decode_uint32_t(buffer);
+	//*enc1=decode_uint32_t(buffer);
+	*enc1=decode_uint32_t(buffer + sizeof(*enc1));
 }
 
 
