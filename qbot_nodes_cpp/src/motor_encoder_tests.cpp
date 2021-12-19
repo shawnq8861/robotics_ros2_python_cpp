@@ -101,9 +101,23 @@ int main(int argc, char * argv[])
         else {
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
         }
-        std::this_thread::sleep_for(2s);
+        
+        //
+        // read encoders to verify movement
+        //
+        if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
+        }
+        
+        //std::this_thread::sleep_for(2s);
+
         //speed_m1 = 0;
         //speed_m2 = 0;
+
         //
         // stop the motors
         //
