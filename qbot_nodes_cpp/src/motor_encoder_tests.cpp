@@ -92,16 +92,17 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
+
         //
         // move the motors
         //
-        if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        }
-        else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        }
-        
+        //if (roboclaw_speed_m1m2(robo, address, speed_m1, speed_m2) != ROBOCLAW_OK) {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        //}
+        //else {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        //}
+
         //
         // read encoders to verify movement
         //
@@ -112,8 +113,12 @@ int main(int argc, char * argv[])
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 cout: " << enc_m1);
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
         }
-        
-        //std::this_thread::sleep_for(2s);
+        //
+        // can't use a timer, the htread blocks, so use a for loop instead
+        //
+        for (int i = 0; i < INT64_MAX; ++i) {
+            continue;
+        }
 
         //speed_m1 = 0;
         //speed_m2 = 0;
@@ -121,12 +126,13 @@ int main(int argc, char * argv[])
         //
         // stop the motors
         //
-        if (roboclaw_speed_m1m2(robo, address, 0, 0) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
-        }
-        else {
-            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
-        }
+        //if (roboclaw_speed_m1m2(robo, address, 0, 0) != ROBOCLAW_OK) {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor speed...\n");
+        //}
+        //else {
+        //    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor speed successfully...\n");
+        //}
+
         //
         // read encoders to verify movement
         //
