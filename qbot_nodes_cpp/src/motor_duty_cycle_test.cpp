@@ -14,6 +14,7 @@
 #include "roboclaw.hpp"
 
 static constexpr int node_priority = 97;
+static constexpr uint8_t max_retries = 3;
 
 using namespace std::chrono_literals;
 
@@ -82,6 +83,8 @@ int main(int argc, char * argv[])
     }
     else {
         uint8_t address = 0x80;
+        uint8_t retry_count = 0;
+        int response = ROBOCLAW_ERROR;
         //
         // lock memory to prevent paging after instantiations are complete
         //
@@ -98,14 +101,21 @@ int main(int argc, char * argv[])
 		//	
 		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
-        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "duty cycle entered: " << duty_cycle);
 		duty_cycle = (float)duty_cycle/100.0f * 32767;
-        RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "duty cycle converted: " << duty_cycle);
         //
         // move the motors
-        //       
-		if(roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2) != ROBOCLAW_OK ) {
-			RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor duty cycle...\n");		
+        //
+        response = roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2);
+		if (response != ROBOCLAW_OK) {
+			RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not set motor duty cycle...\n");
+            while (response != ROBOCLAW_OK && retry_count < max_retries) {
+                ++retry_count;
+                RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "retry number " << retry_count);
+                response = roboclaw_duty_m1m2(robo, address, duty_cycle, duty_cycle/2);
+                if (response == ROBOCLAW_OK) {
+                    RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "retry success!");
+                }
+            }
 		}
         else {
             RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "set motor duty cycle successfully...\n");

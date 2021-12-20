@@ -556,7 +556,6 @@ static void decode_read_encoders(uint8_t *buffer, int32_t *enc1, int32_t *enc2)
  * 
  */
 
-//int roboclaw_duty_m1m2(struct roboclaw *rc, uint8_t address, int16_t duty_m1, int16_t duty_m2);
 int roboclaw_duty_m1m2(struct roboclaw *rc, uint8_t address, int16_t duty_m1, int16_t duty_m2)
 {
 	int bytes=encode_duty_m1m2(rc->buffer, address, duty_m1, duty_m2);
