@@ -10,7 +10,7 @@
 using std::placeholders::_1;
 
 static constexpr int node_priority = 97;
-static constexpr uint8_t max_retries = 3;
+static constexpr int8_t max_retries = 5;
 
 class BaseController : public rclcpp::Node
 {

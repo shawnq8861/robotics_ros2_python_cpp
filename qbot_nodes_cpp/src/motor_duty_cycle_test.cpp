@@ -14,7 +14,7 @@
 #include "roboclaw.hpp"
 
 static constexpr int node_priority = 97;
-static constexpr uint8_t max_retries = 3;
+static constexpr int8_t max_retries = 5;
 
 using namespace std::chrono_literals;
 
@@ -83,7 +83,7 @@ int main(int argc, char * argv[])
     }
     else {
         uint8_t address = 0x80;
-        uint8_t retry_count = 0;
+        int8_t retry_count = 0;
         int response = ROBOCLAW_ERROR;
         //
         // lock memory to prevent paging after instantiations are complete
