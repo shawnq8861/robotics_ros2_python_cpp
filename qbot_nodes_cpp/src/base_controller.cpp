@@ -25,6 +25,7 @@ public:
         if (robo_ == nullptr) {
             RCLCPP_INFO_STREAM(this->get_logger(), "unable to instantiate roboclaw object...\n");
         }
+        drive_wheels();
         subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "cmd_vel", 10, std::bind(&BaseController::cmd_vel_callback, this, _1));
     }
