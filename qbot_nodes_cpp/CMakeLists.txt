@@ -30,6 +30,7 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/CameraCommand.srv"
   "srv/HeadingSpeed.srv"
+  "msg/EncoderCounts.msg"
  )
 
 #
@@ -138,6 +139,9 @@ rosidl_target_interfaces(uvc_camera
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 rosidl_target_interfaces(local_planner
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
+rosidl_target_interfaces(base_controller
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 install(TARGETS 

@@ -3,6 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "roboclaw.hpp"
+#include "qbot_nodes_cpp/msg/encoder_counts.hpp"
 #include <memory>
 #include <sched.h>
 #include <sys/mman.h>
@@ -11,16 +12,27 @@ using std::placeholders::_1;
 
 static constexpr int node_priority = 97;
 static constexpr int8_t max_retries = 5;
+static constexpr double wheel_base = 18.0;
+static constexpr double wheel_diameter = 6.0;
+static constexpr double rpm_max = 192.0;
+static constexpr double pi = 3.1415926;
+//
+// max_v_forward = (rpm_max / 60.0) * pi * wheel_diameter = 60.318 in/sec
+//
+static constexpr double max_v_forward = 60.0;
+//
+// max_v_angular = max_v_forward / (wheel_base / 2.0) = 6.702
+//
+static constexpr double max_v_angular = pi / 4.0;
 
 class BaseController : public rclcpp::Node
 {
 public:
-    BaseController(double width, double diameter)
-    : Node("base_controller"), wheel_diameter_(diameter), wheel_base_(width),
-        port_("/dev/ttymxc2"), baudrate_(38400), address_(0x80)
+    BaseController()
+    : Node("base_controller"), port_("/dev/ttymxc2"), baudrate_(38400), 
+        address_(0x80), v_linear_(0.0), v_angular_(0.0), duty_cycle_left_(0), 
+        duty_cycle_right_(0)
     {
-        RCLCPP_INFO(this->get_logger(), "set wheel base: [%f]", wheel_base_);
-        RCLCPP_INFO(this->get_logger(), "set wheel diameter: [%f]", wheel_diameter_);
         robo_ = roboclaw_init(port_.c_str(), baudrate_);
         if (robo_ == nullptr) {
             RCLCPP_INFO_STREAM(this->get_logger(), "unable to instantiate roboclaw object...\n");
@@ -28,6 +40,7 @@ public:
         drive_wheels();
         subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "cmd_vel", 10, std::bind(&BaseController::cmd_vel_callback, this, _1));
+        publisher_ = this->create_publisher<qbot_nodes_cpp::msg::EncoderCounts>("enc_counts", 10);
     }
 
     ~BaseController()
@@ -38,8 +51,10 @@ public:
 private:
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
-        RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", msg->linear.x);
-        RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", msg->angular.z);
+        v_linear_ = msg->linear.x;
+        v_angular_ = msg->angular.z;
+        RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", v_linear_);
+        RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", v_angular_);
         //
         // need to read and publish encoder count
         //
@@ -47,13 +62,12 @@ private:
     }
     void drive_wheels() {
         //
-        // use kinematic model to compute each wheel rotational velocity
-        // output to the RoboClaw
+        // read encoders and publish counts
         //
         int32_t enc_m1;
         int32_t enc_m2;
         //
-        // read encoders (swiich to running in a ROS loop later on)
+        // read encoders
         //
         if (roboclaw_encoders(robo_, address_, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
             RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
@@ -62,22 +76,103 @@ private:
             RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1);
             RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2);
         }
+        //
+        // publish counts
+        //
+        auto enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
+        enc_counts.enc1_cnt = enc_m1;
+        enc_counts.enc2_cnt = enc_m2;
+        publisher_->publish(enc_counts);
+        //
+        // use kinematic model to compute each wheel rotational velocity
+        // output to the RoboClaw
+        //
+        // linear velocity units are inches/second
+        // angular velocity units are radians/second
+        // max revs/sec (rps) determines limits of linear and angular
+        // max rps occurs at duty cycle = 100
+        // linear = pi * wheel diameter * rps
+        // linear = (linear left + linear right) / 2.0
+        // linear right = (2.0 * linear) - linear left
+        // rps = linear / (pi * wheel diameter)
+
+        // angular = (linear left - linear right) * (wheel base / 2.0)
+        // linear left  - linear right = angular / (wheel base / 2.0)
+        // linear left - ((2.0 * linear) - linear left) = angular / (wheel base / 2.0)
+        // 2.0 * (linear left) - 2.0 * linear = angular / (wheel base / 2.0)
+        //
+        // linear left = linear + angular / wheel base
+        // linear right = (2.0 * linear) - linear left
+        // rps left = (linear left)/ (pi * wheel diameter)
+        // rps right = (linear right)/ (pi * wheel diameter)
+        // rpm left = 60 * rps left
+        // rpm right = 60 * rps right
+        // 
+        // set the duty cycles
+        //
+        // duty left = rpm left / rpm max
+        // duty right = rpm right / rpm max
+        //
+        v_linear_ = 15.0;
+        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        v_angular_ = pi / 8.0;
+        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        double linear_left = v_linear_ + (v_angular_ / wheel_base);
+        double linear_right = (2.0 * v_linear_) - linear_left;
+        double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
+        double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
+		//	
+		// 32767 is max duty cycle setpoint that roboclaw accepts
+        //
+		duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_right_);
+        //
+        // for intial test set both to low value
+        //
+        duty_cycle_left_ = 20.0;
+        duty_cycle_right_ = 15.0;
+        //
+        // move the motors
+        //
+        int8_t retry_count = 0;
+        int response = ROBOCLAW_ERROR;
+        response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
+		if (response != ROBOCLAW_OK) {
+			RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");
+            while (response != ROBOCLAW_OK && retry_count < max_retries) {
+                ++retry_count;
+                RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
+                response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
+                if (response == ROBOCLAW_OK) {
+                    RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
+                }
+            }
+		}
+        else {
+            RCLCPP_INFO_STREAM(this->get_logger(), "set motor duty cycle successfully...\n");
+        }
     }
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
-    double wheel_base_;
-    double wheel_diameter_;
+    rclcpp::Publisher<qbot_nodes_cpp::msg::EncoderCounts>::SharedPtr publisher_;
     std::string port_;
     int baudrate_;
     uint8_t address_;
     struct roboclaw *robo_;
+    double v_linear_;
+    double v_angular_;
+    int duty_cycle_left_;
+    int duty_cycle_right_;
 };
 
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    double width = 18.0;
-    double diameter = 6.0;
-    auto node = std::make_shared<BaseController>(width, diameter);
+    //
+    // instaniate the node
+    //
+    auto node = std::make_shared<BaseController>();
     //
     // use rt extensions
     //
