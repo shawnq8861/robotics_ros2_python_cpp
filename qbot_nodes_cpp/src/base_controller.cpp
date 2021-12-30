@@ -82,6 +82,7 @@ private:
         auto enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
         enc_counts.enc1_cnt = enc_m1;
         enc_counts.enc2_cnt = enc_m2;
+        RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
         publisher_->publish(enc_counts);
         //
         // use kinematic model to compute each wheel rotational velocity
