@@ -83,7 +83,7 @@ private:
         enc_counts.enc1_cnt = enc_m1;
         enc_counts.enc2_cnt = enc_m2;
         RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
-        //publisher_->publish(enc_counts);
+        publisher_->publish(enc_counts);
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
@@ -199,12 +199,12 @@ int main(int argc, char * argv[])
     //
     // lock memory to prevent paging after instantiations are complete
     //
-    mlockall(MCL_CURRENT | MCL_FUTURE);
+    //mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
     //
     // unlock memory before teardown
     //
-    munlockall();
+    //munlockall();
     rclcpp::shutdown();
     
     return 0;
