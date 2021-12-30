@@ -31,8 +31,10 @@ public:
     BaseController()
     : Node("base_controller"), port_("/dev/ttymxc2"), baudrate_(38400), 
         address_(0x80), v_linear_(0.0), v_angular_(0.0), duty_cycle_left_(0), 
-        duty_cycle_right_(0), enc_m1_(0.0), enc_m2_(0.0)
+        duty_cycle_right_(0), enc_m1_(0.0), enc_m2_(0.0) 
     {
+        enc_counts.enc1_cnt = 0;
+        enc_counts.enc2_cnt = 0;
         robo_ = roboclaw_init(port_.c_str(), baudrate_);
         if (robo_ == nullptr) {
             RCLCPP_INFO_STREAM(this->get_logger(), "unable to instantiate roboclaw object...\n");
@@ -62,9 +64,7 @@ private:
     }
     void drive_wheels() {
         //
-        // read encoders and publish counts
-        //
-        
+        // read encoders and publish counts      
         //
         // read encoders
         //
@@ -89,11 +89,11 @@ private:
         //
         // publish counts
         //
-        //auto enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
-        //enc_counts.enc1_cnt = enc_m1;
-        //enc_counts.enc2_cnt = enc_m2;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
-        //publisher_->publish(enc_counts);
+        enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
+        enc_counts.enc1_cnt = enc_m1_;
+        enc_counts.enc2_cnt = enc_m2_;
+        RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
+        publisher_->publish(enc_counts);
 
         //
         // use kinematic model to compute each wheel rotational velocity
@@ -180,6 +180,7 @@ private:
     double v_angular_;
     int duty_cycle_left_;
     int duty_cycle_right_;
+    qbot_nodes_cpp::msg::EncoderCounts enc_counts;
     int32_t enc_m1_;
     int32_t enc_m2_;
 };
