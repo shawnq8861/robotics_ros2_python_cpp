@@ -126,7 +126,7 @@ private:
         // duty left = rpm left / rpm max
         // duty right = rpm right / rpm max
         //
-        v_linear_ = 15.0;
+        v_linear_ = 10.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
         v_angular_ = 0.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
@@ -150,12 +150,12 @@ private:
         //
         // for intial test set both to low value
         //
-        duty_cycle_left_ = 15;
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
-        duty_cycle_right_ = 10;
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
-        duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
+        //duty_cycle_left_ = 10;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        //duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
+        //duty_cycle_right_ = 10;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
+        //duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
         //
         // move the motors
         //
