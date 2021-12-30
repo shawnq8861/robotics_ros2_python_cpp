@@ -68,8 +68,18 @@ private:
         //
         // read encoders
         //
+        int retry_count = 0;
+        int response = ROBOCLAW_ERROR;
         if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
             RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
+            while (response != ROBOCLAW_OK && retry_count < max_retries) {
+                ++retry_count;
+                RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
+                response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
+                if (response == ROBOCLAW_OK) {
+                    RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
+                }
+            }
         }
         else {
             RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
@@ -142,8 +152,8 @@ private:
         //
         // move the motors
         //
-        int8_t retry_count = 0;
-        int response = ROBOCLAW_ERROR;
+        
+        
         response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
 		if (response != ROBOCLAW_OK) {
 			RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");

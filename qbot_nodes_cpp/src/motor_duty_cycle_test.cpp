@@ -102,7 +102,7 @@ int main(int argc, char * argv[])
         }
 
 
-        int8_t retry_count = 0;
+        int retry_count = 0;
         int response = ROBOCLAW_ERROR;
         //
         // lock memory to prevent paging after instantiations are complete
