@@ -92,8 +92,8 @@ private:
         enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
         enc_counts.enc1_cnt = enc_m1_;
         enc_counts.enc2_cnt = enc_m2_;
-        RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
-        publisher_->publish(enc_counts);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
+        //publisher_->publish(enc_counts);
 
         //
         // use kinematic model to compute each wheel rotational velocity
@@ -125,21 +125,21 @@ private:
         // duty left = rpm left / rpm max
         // duty right = rpm right / rpm max
         //
-        //v_linear_ = 15.0;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        //v_angular_ = pi / 8.0;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        //double linear_left = v_linear_ + (v_angular_ / wheel_base);
-        //double linear_right = (2.0 * v_linear_) - linear_left;
-        //double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
-        //double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
+        v_linear_ = 15.0;
+        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        v_angular_ = pi / 8.0;
+        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        double linear_left = v_linear_ + (v_angular_ / wheel_base);
+        double linear_right = (2.0 * v_linear_) - linear_left;
+        double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
+        double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
 		//	
 		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
-		//duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        //duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
+		duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         //
         // for intial test set both to low value
         //
@@ -189,7 +189,7 @@ int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
     //
-    // instaniate the node
+    // instantiate the node
     //
     auto node = std::make_shared<BaseController>();
     //
@@ -215,12 +215,12 @@ int main(int argc, char * argv[])
     //
     // lock memory to prevent paging after instantiations are complete
     //
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
     //
     // unlock memory before teardown
     //
-    //munlockall();
+    munlockall();
     rclcpp::shutdown();
     
     return 0;
