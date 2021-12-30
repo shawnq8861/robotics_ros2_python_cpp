@@ -83,6 +83,25 @@ int main(int argc, char * argv[])
     }
     else {
         uint8_t address = 0x80;
+
+        int32_t enc_m1;
+        int32_t enc_m2;
+        //
+        // lock memory to prevent paging after instantiations are complete
+        //
+        mlockall(MCL_CURRENT | MCL_FUTURE);
+        //
+        // read encoders (swiich to running in a ROS loop later on)
+        //
+        if (roboclaw_encoders(robo, address, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "could not read encoder values...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 1 count: " << enc_m1);
+            RCLCPP_INFO_STREAM(motor_encoder_test_node->get_logger(), "encoder 2 count: " << enc_m2);
+        }
+
+
         int8_t retry_count = 0;
         int response = ROBOCLAW_ERROR;
         //
