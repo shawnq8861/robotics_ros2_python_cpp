@@ -203,12 +203,12 @@ int main(int argc, char * argv[])
     //
     // lock memory to prevent paging after instantiations are complete
     //
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
     //
     // unlock memory before teardown
     //
-    //munlockall();
+    munlockall();
     rclcpp::shutdown();
     
     return 0;
