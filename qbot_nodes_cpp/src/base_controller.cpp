@@ -128,12 +128,14 @@ private:
 		duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
         RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
         duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_right_);
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         //
         // for intial test set both to low value
         //
-        duty_cycle_left_ = 20.0;
-        duty_cycle_right_ = 15.0;
+        duty_cycle_left_ = 15;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        duty_cycle_right_ = 10;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         //
         // move the motors
         //
