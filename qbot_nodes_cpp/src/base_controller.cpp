@@ -88,10 +88,11 @@ private:
 
         //
         // publish counts
+        // put in a timer callback instead
         //
-        enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
-        enc_counts.enc1_cnt = enc_m1_;
-        enc_counts.enc2_cnt = enc_m2_;
+        //enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
+        //enc_counts.enc1_cnt = enc_m1_;
+        //enc_counts.enc2_cnt = enc_m2_;
         //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
         //publisher_->publish(enc_counts);
 
@@ -127,12 +128,16 @@ private:
         //
         v_linear_ = 15.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        v_angular_ = pi / 8.0;
-        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        v_angular_ = 0.0;
+        RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
         double linear_left = v_linear_ + (v_angular_ / wheel_base);
+        RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
         double linear_right = (2.0 * v_linear_) - linear_left;
+        RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
         double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
+        RCLCPP_INFO_STREAM(this->get_logger(), "rpm_left: " << rpm_left);
         double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
+        RCLCPP_INFO_STREAM(this->get_logger(), "rpm_right: " << rpm_right);
 		//	
 		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
