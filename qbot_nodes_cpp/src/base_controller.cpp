@@ -31,7 +31,7 @@ public:
     BaseController()
     : Node("base_controller"), port_("/dev/ttymxc2"), baudrate_(38400), 
         address_(0x80), v_linear_(0.0), v_angular_(0.0), duty_cycle_left_(0), 
-        duty_cycle_right_(0)
+        duty_cycle_right_(0), enc_m1_(0.0), enc_m2_(0.0)
     {
         robo_ = roboclaw_init(port_.c_str(), baudrate_);
         if (robo_ == nullptr) {
@@ -65,18 +65,17 @@ private:
         // read encoders and publish counts
         //
         
-        //int32_t enc_m1;
-        //int32_t enc_m2;
         //
         // read encoders
         //
-        //if (roboclaw_encoders(robo_, address_, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1);
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2);
-        //}
+        if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
+        }
+        else {
+            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
+            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
+        }
+
         //
         // publish counts
         //
@@ -171,6 +170,8 @@ private:
     double v_angular_;
     int duty_cycle_left_;
     int duty_cycle_right_;
+    int32_t enc_m1_;
+    int32_t enc_m2_;
 };
 
 int main(int argc, char * argv[])
