@@ -64,26 +64,28 @@ private:
         //
         // read encoders and publish counts
         //
-        int32_t enc_m1;
-        int32_t enc_m2;
+        
+        //int32_t enc_m1;
+        //int32_t enc_m2;
         //
         // read encoders
         //
-        if (roboclaw_encoders(robo_, address_, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
-        }
-        else {
-            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1);
-            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2);
-        }
+        //if (roboclaw_encoders(robo_, address_, &enc_m1, &enc_m2) != ROBOCLAW_OK) {
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
+        //}
+        //else {
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1);
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2);
+        //}
         //
         // publish counts
         //
-        auto enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
-        enc_counts.enc1_cnt = enc_m1;
-        enc_counts.enc2_cnt = enc_m2;
-        RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
+        //auto enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
+        //enc_counts.enc1_cnt = enc_m1;
+        //enc_counts.enc2_cnt = enc_m2;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
         //publisher_->publish(enc_counts);
+
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
@@ -114,21 +116,21 @@ private:
         // duty left = rpm left / rpm max
         // duty right = rpm right / rpm max
         //
-        v_linear_ = 15.0;
-        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        v_angular_ = pi / 8.0;
-        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        double linear_left = v_linear_ + (v_angular_ / wheel_base);
-        double linear_right = (2.0 * v_linear_) - linear_left;
-        double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
-        double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
+        //v_linear_ = 15.0;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        //v_angular_ = pi / 8.0;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        //double linear_left = v_linear_ + (v_angular_ / wheel_base);
+        //double linear_right = (2.0 * v_linear_) - linear_left;
+        //double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
+        //double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
 		//	
 		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
-		duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
+		//duty_cycle_left_ = (float)(rpm_left / rpm_max)/100.0f * 32767;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        //duty_cycle_right_ = (float)(rpm_right / rpm_max)/100.0f * 32767;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         //
         // for intial test set both to low value
         //
