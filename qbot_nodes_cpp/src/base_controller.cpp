@@ -104,34 +104,43 @@ private:
         // angular velocity units are radians/second
         // max revs/sec (rps) determines limits of linear and angular
         // max rps occurs at duty cycle = 100
+        //
         // linear = pi * wheel diameter * rps
-        // linear = (linear left + linear right) / 2.0
-        // linear right = (2.0 * linear) - linear left
+
+        // linear = (linear right + linear left) / 2.0
+
+        // linear left = (2.0 * linear) - linear right
+
         // rps = linear / (pi * wheel diameter)
 
-        // angular = (linear left - linear right) * (wheel base / 2.0)
-        // linear left  - linear right = angular / (wheel base / 2.0)
-        // linear left - ((2.0 * linear) - linear left) = angular / (wheel base / 2.0)
-        // 2.0 * (linear left) - 2.0 * linear = angular / (wheel base / 2.0)
-        //
-        // linear left = linear + angular / wheel base
-        // linear right = (2.0 * linear) - linear left
-        // rps left = (linear left)/ (pi * wheel diameter)
+        // angular = (linear right - linear left) / (wheel base)
+
+        // linear right  - linear left = angular * (wheel base)
+
+        // linear right - ((2.0 * linear) - linear right) = angular * (wheel base)
+
+        // 2.0 * (linear right) - 2.0 * linear = angular * (wheel base)
+
+        // linear right = linear + ((angular * wheel base) / 2.0)
+
+        // linear left = (2.0 * linear) - linear right
+
         // rps right = (linear right)/ (pi * wheel diameter)
-        // rpm left = 60 * rps left
+        // rps left = (linear left)/ (pi * wheel diameter)
         // rpm right = 60 * rps right
+        // rpm left = 60 * rps left
         // 
         // set the duty cycles
         //
-        // duty left = rpm left / rpm max
         // duty right = rpm right / rpm max
+        // duty left = rpm left / rpm max
         //
         v_linear_ = 10.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
         v_angular_ = pi / 8.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
 
-        double linear_left = v_linear_ + (v_angular_ / wheel_base);
+        double linear_left = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
 
         RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
 
@@ -158,12 +167,12 @@ private:
         //
         // for intial test set both to low value
         //
-        //duty_cycle_left_ = 10;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        //duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
-        //duty_cycle_right_ = 10;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
-        //duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
+        duty_cycle_left_ = 10;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
+        duty_cycle_right_ = 15;
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
+        duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
         //
         // move the motors
         //
