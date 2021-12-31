@@ -140,30 +140,31 @@ private:
         v_angular_ = pi / 8.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
 
-        double linear_left = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
+        double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
+
+        RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
+
+        double linear_left = (2.0 * v_linear_) - linear_right;
 
         RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
 
-        double linear_right = (2.0 * v_linear_) - linear_left;
+        double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
 
-        RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
+        RCLCPP_INFO_STREAM(this->get_logger(), "rpm_right: " << rpm_right);
 
         double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
 
         RCLCPP_INFO_STREAM(this->get_logger(), "rpm_left: " << rpm_left);
 
-        double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
-
-        RCLCPP_INFO_STREAM(this->get_logger(), "rpm_right: " << rpm_right);
 		//	
 		// 32767 is max duty cycle setpoint that roboclaw accepts
         //
-        duty_cycle_left_ = (int)(rpm_left * 100 / rpm_max);
-        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
         duty_cycle_right_ = (int)(rpm_right * 100.0 / rpm_max);
         RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
+        duty_cycle_left_ = (int)(rpm_left * 100 / rpm_max);
+        RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
+        duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
 
         //
         // for intial test set both to low value
@@ -180,13 +181,13 @@ private:
         //
         
         
-        response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_right_, duty_cycle_left_);
+        response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
 		if (response != ROBOCLAW_OK) {
 			RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");
             while (response != ROBOCLAW_OK && retry_count < max_retries) {
                 ++retry_count;
                 RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
-                response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_right_, duty_cycle_left_);
+                response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
                 if (response == ROBOCLAW_OK) {
                     RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
                 }
