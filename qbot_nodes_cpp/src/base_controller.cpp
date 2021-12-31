@@ -174,19 +174,19 @@ private:
         //duty_cycle_right_ = 15;
         //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
         //duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
-        
+
         //
         // move the motors
         //
         
         
-        response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
+        response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_right_, duty_cycle_left_);
 		if (response != ROBOCLAW_OK) {
 			RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");
             while (response != ROBOCLAW_OK && retry_count < max_retries) {
                 ++retry_count;
                 RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
-                response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
+                response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_right_, duty_cycle_left_);
                 if (response == ROBOCLAW_OK) {
                     RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
                 }
