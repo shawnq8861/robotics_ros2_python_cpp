@@ -1,4 +1,5 @@
 #include <memory>
+#include <chrono>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
@@ -8,6 +9,7 @@
 #include <sched.h>
 #include <sys/mman.h>
 
+using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 static constexpr int node_priority = 97;
@@ -35,6 +37,10 @@ public:
     {
         enc_counts.enc1_cnt = 0;
         enc_counts.enc2_cnt = 0;
+        period_ = 500ms;
+        period_mag_ = period_.count();
+        timer_ = this->create_wall_timer(
+            period_, std::bind(&BaseController::timer_callback, this));
         robo_ = roboclaw_init(port_.c_str(), baudrate_);
         if (robo_ == nullptr) {
             RCLCPP_INFO_STREAM(this->get_logger(), "unable to instantiate roboclaw object...\n");
@@ -51,6 +57,19 @@ public:
     }
 
 private:
+    void timer_callback()
+    {
+        RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_m1_, enc_m2_);
+        //
+        // publish counts
+        // put in a timer callback instead
+        //
+        //enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
+        //enc_counts.enc1_cnt = enc_m1_;
+        //enc_counts.enc2_cnt = enc_m2_;
+        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
+        //publisher_->publish(enc_counts);
+    }
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
         v_linear_ = msg->linear.x;
@@ -85,17 +104,6 @@ private:
             RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
             RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
         }
-
-        //
-        // publish counts
-        // put in a timer callback instead
-        //
-        //enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
-        //enc_counts.enc1_cnt = enc_m1_;
-        //enc_counts.enc2_cnt = enc_m2_;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
-        //publisher_->publish(enc_counts);
-
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
@@ -106,25 +114,15 @@ private:
         // max rps occurs at duty cycle = 100
         //
         // linear = pi * wheel diameter * rps
-
         // linear = (linear right + linear left) / 2.0
-
         // linear left = (2.0 * linear) - linear right
-
         // rps = linear / (pi * wheel diameter)
-
         // angular = (linear right - linear left) / (wheel base)
-
         // linear right  - linear left = angular * (wheel base)
-
         // linear right - ((2.0 * linear) - linear right) = angular * (wheel base)
-
         // 2.0 * (linear right) - 2.0 * linear = angular * (wheel base)
-
         // linear right = linear + ((angular * wheel base) / 2.0)
-
         // linear left = (2.0 * linear) - linear right
-
         // rps right = (linear right)/ (pi * wheel diameter)
         // rps left = (linear left)/ (pi * wheel diameter)
         // rpm right = 60 * rps right
@@ -165,22 +163,9 @@ private:
         duty_cycle_left_ = (int)(rpm_left * 100 / rpm_max);
         RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
         duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
-
-        //
-        // for intial test set both to low value
-        //
-        //duty_cycle_left_ = 10;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle left: " << duty_cycle_left_);
-        //duty_cycle_left_ = (float)duty_cycle_left_/100.0f * 32767;
-        //duty_cycle_right_ = 15;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "duty cycle right: " << duty_cycle_right_);
-        //duty_cycle_right_ = (float)duty_cycle_right_/100.0f * 32767;
-
         //
         // move the motors
         //
-        
-        
         response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
 		if (response != ROBOCLAW_OK) {
 			RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");
@@ -197,6 +182,7 @@ private:
             RCLCPP_INFO_STREAM(this->get_logger(), "set motor duty cycle successfully...\n");
         }
     }
+    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
     rclcpp::Publisher<qbot_nodes_cpp::msg::EncoderCounts>::SharedPtr publisher_;
     std::string port_;
@@ -210,6 +196,8 @@ private:
     qbot_nodes_cpp::msg::EncoderCounts enc_counts;
     int32_t enc_m1_;
     int32_t enc_m2_;
+    std::chrono::milliseconds period_;
+    unsigned int period_mag_;
 };
 
 int main(int argc, char * argv[])
