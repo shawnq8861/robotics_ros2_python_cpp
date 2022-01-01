@@ -8,16 +8,17 @@
 #include <memory>
 #include <sched.h>
 #include <sys/mman.h>
+#include "robot_configuration.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-static constexpr int node_priority = 97;
-static constexpr int8_t max_retries = 5;
-static constexpr double wheel_base = 18.0;
-static constexpr double wheel_diameter = 6.0;
-static constexpr double rpm_max = 192.0;
-static constexpr double pi = 3.1415926;
+//static constexpr int node_priority = 97;
+//static constexpr int8_t max_retries = 5;
+//static constexpr double wheel_base = 18.0;
+//static constexpr double wheel_diameter = 6.0;
+//static constexpr double rpm_max = 192.0;
+//static constexpr double pi = 3.1415926;
 //
 // max_v_forward = (rpm_max / 60.0) * pi * wheel_diameter = 60.318 in/sec
 //
@@ -33,7 +34,7 @@ public:
     BaseController()
     : Node("base_controller"), port_("/dev/ttymxc2"), baudrate_(38400), 
         address_(0x80), v_linear_(0.0), v_angular_(0.0), duty_cycle_left_(0), 
-        duty_cycle_right_(0), enc_m1_(0.0), enc_m2_(0.0) 
+        duty_cycle_right_(0), enc_m1_(0), enc_m2_(0) 
     {
         enc_counts.enc1_cnt = 0;
         enc_counts.enc2_cnt = 0;
@@ -64,7 +65,6 @@ private:
         // publish counts
         // put in a timer callback instead
         //
-        //enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
         enc_counts.enc1_cnt = enc_m1_;
         enc_counts.enc2_cnt = enc_m2_;
         RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_counts.enc1_cnt, enc_counts.enc2_cnt);
