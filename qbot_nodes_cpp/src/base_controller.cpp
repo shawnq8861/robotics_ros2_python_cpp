@@ -22,11 +22,11 @@ using std::placeholders::_1;
 //
 // max_v_forward = (rpm_max / 60.0) * pi * wheel_diameter = 60.318 in/sec
 //
-static constexpr double max_v_forward = 60.0;
+//static constexpr double max_v_forward = 60.0;
 //
 // max_v_angular = max_v_forward / (wheel_base / 2.0) = 6.702
 //
-static constexpr double max_v_angular = pi / 4.0;
+//static constexpr double max_v_angular = pi / 4.0;
 
 class BaseController : public rclcpp::Node
 {
@@ -134,9 +134,9 @@ private:
         // duty right = rpm right / rpm max
         // duty left = rpm left / rpm max
         //
-        v_linear_ = 10.0;
+        //v_linear_ = 10.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        v_angular_ = pi / 8.0;
+        //v_angular_ = pi / 8.0;
         RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
 
         double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
@@ -216,7 +216,7 @@ int main(int argc, char * argv[])
     //
 	// Passing zero specifies caller’s (our) policy
     //
-	my_params.sched_priority = node_priority;
+	my_params.sched_priority = base_controller_priority;
     //
 	// Passing zero specifies callers (our) pid
     // Set policy to SCHED_RR, no preemption with time slicing

@@ -12,6 +12,7 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include "qbot_nodes_cpp/srv/heading_speed.hpp"
 #include "camera_interface_header.hpp"
+#include "robot_configuration.hpp"
 
 using namespace std::chrono_literals;
 
@@ -32,10 +33,10 @@ public:
         heading_ = 0.0;
         new_heading_ = heading_;
         omega_ = 0.0;
-        rotation_step_ = 0.50;
+        rotation_step_ = max_delta_omega;
         speed_ = 0.0;
         new_speed_ = speed_;
-        speed_delta_ = 0.25;
+        speed_delta_ = max_delta_v;
         cmd_vel_msg_.linear.x = speed_;
         cmd_vel_msg_.linear.y = 0.0;
         cmd_vel_msg_.linear.z = 0.0;
@@ -48,6 +49,7 @@ public:
         //
         // command to test:  ros2 service call /set_heading_speed 
         // qbot_nodes_cpp/srv/HeadingSpeed "{heading: 3.24, speed: 12.9}"
+        // where:  heading is in degrees, speed is in in/sec
         //
         auto handle_set_heading_speed =
             [this](const std::shared_ptr<rmw_request_id_t> request_header,
@@ -56,7 +58,14 @@ public:
         {
             (void)request_header;
             new_heading_ = request->heading;
+            //
+            // convert to radians
+            //
+            new_heading_ = new_heading_ * pi / 180.0;
             new_speed_ = request->speed;
+            if (new_speed_ > max_v_forward) {
+                new_speed_ = max_v_forward;
+            }
             RCLCPP_INFO(this->get_logger(), "Requested heading: '%f', speed: '%f'", new_heading_, new_speed_);
             response = 0;
         };
