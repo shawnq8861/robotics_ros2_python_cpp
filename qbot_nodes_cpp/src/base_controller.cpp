@@ -59,16 +59,17 @@ public:
 private:
     void timer_callback()
     {
-        RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_m1_, enc_m2_);
+        //RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_m1_, enc_m2_);
         //
         // publish counts
         // put in a timer callback instead
         //
         //enc_counts = qbot_nodes_cpp::msg::EncoderCounts();
-        //enc_counts.enc1_cnt = enc_m1_;
-        //enc_counts.enc2_cnt = enc_m2_;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
-        //publisher_->publish(enc_counts);
+        enc_counts.enc1_cnt = enc_m1_;
+        enc_counts.enc2_cnt = enc_m2_;
+        RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_counts.enc1_cnt, enc_counts.enc2_cnt);
+        RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
+        publisher_->publish(enc_counts);
     }
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
