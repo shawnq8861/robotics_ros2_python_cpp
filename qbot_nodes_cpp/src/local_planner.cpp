@@ -6,6 +6,8 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <sched.h>
+#include <sys/mman.h>
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
@@ -158,7 +160,35 @@ int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<LocalPlanner>();
+    //
+    // use rt extensions
+    //
+    int rc = -1;
+	struct sched_param my_params;
+    //
+	// Passing zero specifies caller’s (our) policy
+    //
+	my_params.sched_priority = local_planner_priority;
+    //
+	// Passing zero specifies callers (our) pid
+    // Set policy to SCHED_RR, no preemption with time slicing
+    //
+	rc = sched_setscheduler(0, SCHED_RR, &my_params);
+    if ( rc == -1 ) {
+        std::cout << "could not change scheduler policy" << std::endl;
+    }
+    else {
+        std::cout << "changed scheduler policy" << std::endl;
+    }
+    //
+    // lock memory to prevent paging after instantiations are complete
+    //
+    mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
+    //
+    // unlock memory before teardown
+    //
+    munlockall();
     rclcpp::shutdown();
     return 0;
 }

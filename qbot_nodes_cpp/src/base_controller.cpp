@@ -13,21 +13,6 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-//static constexpr int node_priority = 97;
-//static constexpr int8_t max_retries = 5;
-//static constexpr double wheel_base = 18.0;
-//static constexpr double wheel_diameter = 6.0;
-//static constexpr double rpm_max = 192.0;
-//static constexpr double pi = 3.1415926;
-//
-// max_v_forward = (rpm_max / 60.0) * pi * wheel_diameter = 60.318 in/sec
-//
-//static constexpr double max_v_forward = 60.0;
-//
-// max_v_angular = max_v_forward / (wheel_base / 2.0) = 6.702
-//
-//static constexpr double max_v_angular = pi / 4.0;
-
 class BaseController : public rclcpp::Node
 {
 public:
@@ -111,22 +96,7 @@ private:
         //
         int retry_count = 0;
         int response = ROBOCLAW_ERROR;
-        //if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
-        //    while (response != ROBOCLAW_OK && retry_count < max_retries) {
-        //        ++retry_count;
-        //        RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
-        //        response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
-        //        if (response == ROBOCLAW_OK) {
-        //            RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
-        //        }
-        //    }
-        //}
-        //else {
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
-        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
-        //}
-
+ 
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
