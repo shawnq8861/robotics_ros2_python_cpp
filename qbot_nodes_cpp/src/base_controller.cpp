@@ -60,7 +60,28 @@ public:
 private:
     void timer_callback()
     {
-        //RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_m1_, enc_m2_);
+        //
+        // read encoders and publish counts      
+        //
+        // read encoders
+        //
+        int retry_count = 0;
+        int response = ROBOCLAW_ERROR;
+        if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
+            RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
+            while (response != ROBOCLAW_OK && retry_count < max_retries) {
+                ++retry_count;
+                RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
+                response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
+                if (response == ROBOCLAW_OK) {
+                    RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
+                }
+            }
+        }
+        else {
+            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
+            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
+        }
         //
         // publish counts
         // put in a timer callback instead
@@ -90,21 +111,22 @@ private:
         //
         int retry_count = 0;
         int response = ROBOCLAW_ERROR;
-        if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
-            RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
-            while (response != ROBOCLAW_OK && retry_count < max_retries) {
-                ++retry_count;
-                RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
-                response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
-                if (response == ROBOCLAW_OK) {
-                    RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
-                }
-            }
-        }
-        else {
-            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
-            RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
-        }
+        //if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
+        //    while (response != ROBOCLAW_OK && retry_count < max_retries) {
+        //        ++retry_count;
+        //        RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
+        //        response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
+        //        if (response == ROBOCLAW_OK) {
+        //            RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
+        //        }
+        //    }
+        //}
+        //else {
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
+        //    RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
+        //}
+
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
@@ -134,10 +156,9 @@ private:
         // duty right = rpm right / rpm max
         // duty left = rpm left / rpm max
         //
-        //v_linear_ = 10.0;
-        RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        //v_angular_ = pi / 8.0;
-        RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
+
+        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
 
         double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
 

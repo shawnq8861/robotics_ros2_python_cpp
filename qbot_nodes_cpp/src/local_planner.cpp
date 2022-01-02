@@ -74,7 +74,7 @@ public:
         // subscribe to image published by camera node
         //
         subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "uvc_camera/image", 10, std::bind(&LocalPlanner::img_subscriber_callback, this, _1));
+        "image_processed", 10, std::bind(&LocalPlanner::img_subscriber_callback, this, _1));
     }
 
 private:
