@@ -53,19 +53,10 @@ private:
         int retry_count = 0;
         int response = ROBOCLAW_ERROR;
         if (roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_) != ROBOCLAW_OK) {
-            //RCLCPP_INFO_STREAM(this->get_logger(), "could not read encoder values...\n");
             while (response != ROBOCLAW_OK && retry_count < max_retries) {
                 ++retry_count;
-                //RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
                 response = roboclaw_encoders(robo_, address_, &enc_m1_, &enc_m2_);
-                if (response == ROBOCLAW_OK) {
-                    //RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
-                }
             }
-        }
-        else {
-            //RCLCPP_INFO_STREAM(this->get_logger(), "encoder 1 count: " << enc_m1_);
-            //RCLCPP_INFO_STREAM(this->get_logger(), "encoder 2 count: " << enc_m2_);
         }
         //
         // publish counts
@@ -74,7 +65,6 @@ private:
         enc_counts.enc1_cnt = enc_m1_;
         enc_counts.enc2_cnt = enc_m2_;
         RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_counts.enc1_cnt, enc_counts.enc2_cnt);
-        //RCLCPP_INFO_STREAM(this->get_logger(), "publishing...\n");
         publisher_->publish(enc_counts);
     }
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
@@ -89,14 +79,8 @@ private:
         drive_wheels();
     }
     void drive_wheels() {
-        //
-        // read encoders and publish counts      
-        //
-        // read encoders
-        //
         int retry_count = 0;
         int response = ROBOCLAW_ERROR;
- 
         //
         // use kinematic model to compute each wheel rotational velocity
         // output to the RoboClaw
@@ -126,10 +110,6 @@ private:
         // duty right = rpm right / rpm max
         // duty left = rpm left / rpm max
         //
-
-        //RCLCPP_INFO_STREAM(this->get_logger(), "v_linear: " << v_linear_);
-        //RCLCPP_INFO_STREAM(this->get_logger(), "v_angular: " << v_angular_);
-
         double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
         RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
         double linear_left = (2.0 * v_linear_) - linear_right;
@@ -148,19 +128,11 @@ private:
         //
         response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
 		if (response != ROBOCLAW_OK) {
-			//RCLCPP_INFO_STREAM(this->get_logger(), "could not set motor duty cycle...\n");
             while (response != ROBOCLAW_OK && retry_count < max_retries) {
                 ++retry_count;
-                //RCLCPP_INFO_STREAM(this->get_logger(), "retry number " << retry_count);
                 response = roboclaw_duty_m1m2(robo_, address_, duty_cycle_left_, duty_cycle_right_);
-                if (response == ROBOCLAW_OK) {
-                    //RCLCPP_INFO_STREAM(this->get_logger(), "retry success!");
-                }
             }
 		}
-        else {
-            //RCLCPP_INFO_STREAM(this->get_logger(), "set motor duty cycle successfully...\n");
-        }
     }
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;

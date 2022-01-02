@@ -84,20 +84,6 @@ public:
 private:
     void timer_callback()
     {
-        //
-        // update heading and speed, then publish
-        //
-        //if (abs(new_speed_ - speed_) > speed_delta_) {
-        //    if (speed_ > new_speed_) {
-        //        speed_ -= speed_delta_;
-        //    }
-        //    else {
-        //        speed_ += speed_delta_;
-        //    }
-        //}
-        //else {
-        //    speed_ = new_speed_;
-        //}
         if (new_speed_ < old_speed_ && curr_speed_ > new_speed_) {
             curr_speed_ -= speed_delta_;
         }
@@ -108,34 +94,18 @@ private:
             curr_speed_ = new_speed_;
             old_speed_ = new_speed_;
         }
-        //if (abs(new_heading_ - heading_) > rotation_step_) {
-        //    if (heading_ > new_heading_) {
-        //        heading_ -= rotation_step_;
-        //    }
-        //    else {
-        //        heading_ += rotation_step_;
-        //    }
-        //    omega_ = rotation_step_ / ((double)period_mag_ / 1000.0);
-        //}
-        //else {
-        //    heading_ = new_heading_;
-        //    omega_ = 0.0;
-        //}
         if (new_heading_ < old_heading_ && curr_heading_ > new_heading_) {
             curr_heading_ -= max_v_angular * (period_mag_ / 1000.0);
             omega_ = -max_v_angular;
-            RCLCPP_INFO_STREAM(this->get_logger(), "omega_: " << omega_);
         }
         else if (new_heading_ > old_heading_ && curr_heading_ < new_heading_) {
             curr_heading_ += max_v_angular * (period_mag_ / 1000.0);
             omega_ = max_v_angular;
-            RCLCPP_INFO_STREAM(this->get_logger(), "omega_: " << omega_);
         }
         else {
             curr_heading_ = new_heading_;
             old_heading_ = new_heading_;
             omega_ = 0.0;
-            RCLCPP_INFO_STREAM(this->get_logger(), "omega_: " << omega_);
         }
         RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
         cmd_vel_msg_.linear.x = curr_speed_;
@@ -176,7 +146,6 @@ private:
     double new_heading_;
     double old_heading_;
     double omega_;
-    //double rotation_step_;
     double curr_speed_;
     double new_speed_;
     double old_speed_;
