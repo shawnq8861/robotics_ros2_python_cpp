@@ -6,14 +6,18 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <sched.h>
+#include <sys/mman.h>
 #include <string>
 
-#include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/twist.hpp"
-#include "qbot_nodes_cpp/srv/heading_speed.hpp"
-#include "camera_interface_header.hpp"
-
-using namespace std::chrono_literals;
+#include <rclcpp/rclcpp.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include "qbot_nodes_cpp/msg/encoder_counts.hpp"
+#include "robot_configuration.hpp"
 
 using std::placeholders::_1;
 
@@ -21,127 +25,106 @@ class Odometry : public rclcpp::Node
 {
 public:
     Odometry()
-    : Node("local_planner")
+    : Node("odometry"), count_(0)
     {
-        count_ = 0;
-        publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-        period_ = 500ms;
-        period_mag_ = period_.count();
-        timer_ = this->create_wall_timer(
-            period_, std::bind(&Odometry::timer_callback, this));
-        heading_ = 0.0;
-        new_heading_ = heading_;
-        omega_ = 0.0;
-        rotation_step_ = 0.50;
-        speed_ = 0.0;
-        new_speed_ = speed_;
-        speed_delta_ = 0.25;
-        cmd_vel_msg_.linear.x = speed_;
-        cmd_vel_msg_.linear.y = 0.0;
-        cmd_vel_msg_.linear.z = 0.0;
-        cmd_vel_msg_.angular.x = 0.0;
-        cmd_vel_msg_.angular.y = 0.0;
-        cmd_vel_msg_.angular.z = omega_;
+        curr_time = this->get_clock()->now();
+        prev_time = curr_time;
         //
-        // use lambda expression to handle service callback
-        // to avoid using std::bind, which is messy for sevice callbacks
+        // initialize the encoder counts subscriber
         //
-        // command to test:  ros2 service call /set_heading_speed 
-        // qbot_nodes_cpp/srv/HeadingSpeed "{heading: 3.24, speed: 12.9}"
+        subscription_ = this->create_subscription<qbot_nodes_cpp::msg::EncoderCounts>(
+        "enc_counts", 10, std::bind(&Odometry::subscriber_callback, this, _1));
         //
-        auto handle_set_heading_speed =
-            [this](const std::shared_ptr<rmw_request_id_t> request_header,
-                const std::shared_ptr<qbot_nodes_cpp::srv::HeadingSpeed::Request> request,
-                            std::shared_ptr<qbot_nodes_cpp::srv::HeadingSpeed::Response> response) -> void
-        {
-            (void)request_header;
-            new_heading_ = request->heading;
-            new_speed_ = request->speed;
-            RCLCPP_INFO(this->get_logger(), "Requested heading: '%f', speed: '%f'", new_heading_, new_speed_);
-            response = 0;
-        };
-        service_ = create_service<qbot_nodes_cpp::srv::HeadingSpeed>("set_heading_speed", handle_set_heading_speed);
+        // initialize the transform broadcaster
         //
-        // subscribe to image published by camera node
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
         //
-        subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "uvc_camera/image", 10, std::bind(&Odometry::img_subscriber_callback, this, _1));
+        // initialize the odometry message publisher
+        //
+        publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("odom", 10);
     }
 
 private:
-    void timer_callback()
+    void subscriber_callback(const sensor_msgs::msg::Image::SharedPtr img_ptr)
     {
-        //
-        // update heading and speed, then publish
-        //
-        if (abs(new_speed_ - speed_) > speed_delta_) {
-            if (speed_ > new_speed_) {
-                speed_ -= speed_delta_;
-            }
-            else {
-                speed_ += speed_delta_;
-            }
-        }
-        else {
-            speed_ = new_speed_;
-        }
-        if (abs(new_heading_ - heading_) > rotation_step_) {
-            if (heading_ > new_heading_) {
-                heading_ -= rotation_step_;
-            }
-            else {
-                heading_ += rotation_step_;
-            }
-            omega_ = rotation_step_ / ((double)period_mag_ / 1000.0);
-        }
-        else {
-            heading_ = new_heading_;
-            omega_ = 0.0;
-        }
-        RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", heading_, speed_);
-        cmd_vel_msg_.linear.x = speed_;
-        RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg_.linear.x);
-        cmd_vel_msg_.angular.z = omega_;
-        RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg_.angular.z);
-        publisher_->publish(cmd_vel_msg_);
-    }
-
-    void img_subscriber_callback(const sensor_msgs::msg::Image::SharedPtr img_ptr)
-    {
+        curr_time = this->get_clock()->now();
         RCLCPP_INFO_STREAM(this->get_logger(), "\n\nsubscriber count_: " << count_ << "\n");
         ++count_;
-        int rows = img_ptr->height;
-        int cols = img_ptr->width;
-        int type = CV_8UC3;
-        cv::Mat image(rows, cols, type, &img_ptr->data[0]);
-        if (count_ == 5) {
-            count_ = 0;
-            compute_heading(image);
-        }
-    }
+        //
+        // compute odometry in a typical way given the velocities of the robot
+        //
+        double x = 0.0;
+        double y = 0.0;
+        double th = 0.0;
+        double vx = 0.1;
+        double vy = -0.1;
+        double vth = 0.1;
+        rclcpp::Duration dt = curr_time - prev_time;
+        double dt_sec = dt.nanoseconds() / 1e9;
+        double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
+        double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
+        double delta_th = vth * dt;
+        
+        x += delta_x;
+        y += delta_y;
+        theta += delta_th;
+        //
+        // since all odometry is 6DOF we'll need a quaternion created from yaw
+        //
+        tf2::Quaternion quat;
 
-    void compute_heading(cv::Mat image)
-    {
-        RCLCPP_INFO_STREAM(this->get_logger(), "rows: " << image.rows);
-        RCLCPP_INFO_STREAM(this->get_logger(), "cols: " << image.cols);
-        std::string homedir = getenv("HOME");
-        cv::imwrite(homedir + "/Pictures/saved_image.jpg", image);
-    }
+        //first, we'll publish the transform over tf
+        geometry_msgs::TransformStamped odom_trans;
+        odom_trans.header.stamp = current_time;
+        odom_trans.header.frame_id = "odom";
+        odom_trans.child_frame_id = "base_link";
+        odom_trans.transform.translation.x = x;
+        odom_trans.transform.translation.y = y;
+        odom_trans.transform.translation.z = 0.0;
 
-    rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
-    geometry_msgs::msg::Twist cmd_vel_msg_;
-    rclcpp::Service<qbot_nodes_cpp::srv::HeadingSpeed>::SharedPtr service_;
-    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
-    double heading_;
-    double new_heading_;
-    double omega_;
-    double rotation_step_;
-    double speed_;
-    double new_speed_;
-    double speed_delta_;
-    std::chrono::milliseconds period_;
-    unsigned int period_mag_;
+        tf2::Quaternion quat;
+        quat.setRPY(0, 0, msg->theta);
+        odom_trans.transform.rotation.x = quat.x();
+        odom_trans.transform.rotation.y = quat.y();
+        odom_trans.transform.rotation.z = quat.z();
+        odom_trans.transform.rotation.w = quat.w();
+
+        // Send the transformation
+        tf_broadcaster_->sendTransform(odom_trans);
+        
+        
+        
+        
+        
+        //
+        // next, we'll publish the odometry message over ROS
+        //
+        nav_msgs::Odometry odom;
+        odom.header.stamp = current_time;
+        odom.header.frame_id = "odom";
+        
+        //set the position
+        odom.pose.pose.position.x = x;
+        odom.pose.pose.position.y = y;
+        odom.pose.pose.position.z = 0.0;
+        odom.pose.pose.orientation = odom_quat;
+        
+        //set the velocity
+        odom.child_frame_id = "base_link";
+        odom.twist.twist.linear.x = vx;
+        odom.twist.twist.linear.y = vy;
+        odom.twist.twist.angular.z = vth;
+        
+        //publish the message
+        odom_pub.publish(odom);
+
+        prev_time = curr_time;
+    }   
+    rclcpp::Subscription<qbot_nodes_cpp::msg::EncoderCounts>::SharedPtr subscription_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher_;
+    rclcpp::Time curr_time;
+    rclcpp::Time prev_time;
     int count_;
 };
 
