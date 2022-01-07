@@ -23,6 +23,10 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 #
 # need the following to enable building custom services
@@ -132,6 +136,16 @@ target_include_directories(motor_duty_cycle_test PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+add_executable(odometry src/odometry.cpp)
+  ament_target_dependencies(odometry 
+    rclcpp
+    geometry_msgs
+    nav_msgs
+    tf2_geometry_msgs)
+target_include_directories(odometry PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
 #
 # need the following to enable using the custon srv
 #
@@ -142,6 +156,9 @@ rosidl_target_interfaces(local_planner
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 rosidl_target_interfaces(base_controller
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
+rosidl_target_interfaces(odometry
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 install(TARGETS 
@@ -156,6 +173,7 @@ install(TARGETS
   motor_start
   encoder_test
   motor_duty_cycle_test
+  odometry
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -19,7 +19,7 @@ public:
     BaseController()
     : Node("base_controller"), port_("/dev/ttymxc2"), baudrate_(38400), 
         address_(0x80), v_linear_(0.0), v_angular_(0.0), duty_cycle_left_(0), 
-        duty_cycle_right_(0), enc_m1_(0), enc_m2_(0) 
+        duty_cycle_right_(0), enc_m1_(0), enc_m2_(0)
     {
         enc_counts.enc1_cnt = 0;
         enc_counts.enc2_cnt = 0;
