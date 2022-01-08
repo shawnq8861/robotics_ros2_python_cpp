@@ -41,6 +41,7 @@ public:
         new_speed_ = curr_speed_;
         old_speed_ = curr_speed_;
         speed_delta_ = max_delta_v;
+        heading_delta_ = max_v_angular * (period_mag_ / 1000.0);
         cmd_vel_msg_.linear.x = curr_speed_;
         cmd_vel_msg_.linear.y = 0.0;
         cmd_vel_msg_.linear.z = 0.0;
@@ -85,22 +86,44 @@ private:
     void timer_callback()
     {
         if (new_speed_ < old_speed_ && curr_speed_ > new_speed_) {
-            curr_speed_ -= speed_delta_;
+            if ((curr_speed_ - new_speed_) < speed_delta_) {
+                curr_speed_ = new_speed_;
+            }
+            else {
+                curr_speed_ -= speed_delta_;
+            }
         }
         else if (new_speed_ > old_speed_ && curr_speed_ < new_speed_) {
-            curr_speed_ += speed_delta_;
+            if ((new_speed_ - curr_speed_) < speed_delta_) {
+                curr_speed_ = new_speed_;
+            }
+            else {
+                curr_speed_ += speed_delta_;
+            }
         }
         else {
             curr_speed_ = new_speed_;
             old_speed_ = new_speed_;
         }
         if (new_heading_ < old_heading_ && curr_heading_ > new_heading_) {
-            curr_heading_ -= max_v_angular * (period_mag_ / 1000.0);
-            omega_ = -max_v_angular;
+            if ((curr_heading_ - new_heading_) < heading_delta_) {
+                curr_heading_ = new_heading_;
+                omega_ = -max_v_angular * ((curr_heading_ - new_heading_) / heading_delta_);
+            }
+            else {
+                curr_heading_ -= heading_delta_;
+                omega_ = -max_v_angular;
+            }
         }
         else if (new_heading_ > old_heading_ && curr_heading_ < new_heading_) {
-            curr_heading_ += max_v_angular * (period_mag_ / 1000.0);
-            omega_ = max_v_angular;
+            if ((new_heading_ - curr_heading_) < heading_delta_) {
+                curr_heading_ = new_heading_;
+                omega_ = max_v_angular * ((new_heading_ - curr_heading_) / heading_delta_);
+            }
+            else {
+                curr_heading_ += heading_delta_;
+                omega_ = max_v_angular;
+            }
         }
         else {
             curr_heading_ = new_heading_;
@@ -150,6 +173,7 @@ private:
     double new_speed_;
     double old_speed_;
     double speed_delta_;
+    double heading_delta_;
     std::chrono::milliseconds period_;
     unsigned int period_mag_;
     int count_;
