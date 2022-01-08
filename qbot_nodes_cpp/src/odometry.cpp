@@ -9,6 +9,7 @@
 #include <sched.h>
 #include <sys/mman.h>
 #include <string>
+#include <math.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include <nav_msgs/msg/odometry.hpp>
@@ -70,13 +71,13 @@ private:
         //
         enc_m1_curr_ = msg->enc1_cnt;
         enc_m2_curr_ = msg->enc2_cnt;
-        double delta_left = ((double)(enc_m1_curr_ - enc_m1_prev_))/((double)(enc_counts_per_rev) * pi * wheel_diameter);
-        double delta_right = ((double)(enc_m2_curr_ - enc_m2_prev_))/((double)(enc_counts_per_rev) * pi * wheel_diameter);
+        double delta_left = ((pi * wheel_diameter) * ((double)(enc_m1_curr_ - enc_m1_prev_))) / ((double)(enc_counts_per_rev));
+        double delta_right = ((pi * wheel_diameter) * ((double)(enc_m2_curr_ - enc_m2_prev_))) / ((double)(enc_counts_per_rev));
         double delta_dist = (delta_right + delta_left) / 2.0;
         double delta_th = (delta_right - delta_left) / wheel_base;
-        theta_ += delta_th;
         double delta_x = delta_dist * cos(theta_ + (delta_th / 2.0));
         double delta_y = delta_dist * sin(theta_ + (delta_th / 2.0));
+        theta_ += delta_th;
         x_ += delta_x;
         y_ += delta_y;
         vx_ = delta_x / dt_sec;
