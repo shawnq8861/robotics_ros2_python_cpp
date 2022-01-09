@@ -86,7 +86,7 @@ ament_target_dependencies(local_planner
   rclcpp
   geometry_msgs
   sensor_msgs
-  OpenCV)
+  nav_msgs)
 target_include_directories(local_planner PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)

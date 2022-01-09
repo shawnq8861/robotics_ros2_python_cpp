@@ -12,8 +12,10 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include <nav_msgs/msg/odometry.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include "qbot_nodes_cpp/srv/heading_speed.hpp"
-#include "camera_interface_header.hpp"
 #include "robot_configuration.hpp"
 
 using namespace std::chrono_literals;
@@ -26,7 +28,6 @@ public:
     LocalPlanner()
     : Node("local_planner")
     {
-        count_ = 0;
         publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
         period_ = 500ms;
         period_mag_ = period_.count();
@@ -78,8 +79,8 @@ public:
         //
         // subscribe to image published by camera node
         //
-        subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "image_processed", 10, std::bind(&LocalPlanner::img_subscriber_callback, this, _1));
+        subscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        "odom", 10, std::bind(&LocalPlanner::subscriber_callback, this, _1));
     }
 
 private:
@@ -129,6 +130,11 @@ private:
             curr_heading_ = new_heading_;
             old_heading_ = new_heading_;
             omega_ = 0.0;
+            //
+            // TODO: read the odometry and make adjustment
+            //       add a subcrober to odom topic
+            //       look into async spinner for ROS 2
+            //
         }
         RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
         cmd_vel_msg_.linear.x = curr_speed_;
@@ -138,33 +144,36 @@ private:
         publisher_->publish(cmd_vel_msg_);
     }
 
-    void img_subscriber_callback(const sensor_msgs::msg::Image::SharedPtr img_ptr)
+    void subscriber_callback(const nav_msgs::msg::Odometry::SharedPtr odom_ptr)
     {
-        RCLCPP_INFO_STREAM(this->get_logger(), "\n\nsubscriber count_: " << count_ << "\n");
-        ++count_;
-        int rows = img_ptr->height;
-        int cols = img_ptr->width;
-        int type = CV_8UC3;
-        cv::Mat image(rows, cols, type, &img_ptr->data[0]);
-        if (count_ == 5) {
-            count_ = 0;
-            compute_heading(image);
-        }
-    }
-
-    void compute_heading(cv::Mat image)
-    {
-        RCLCPP_INFO_STREAM(this->get_logger(), "rows: " << image.rows);
-        RCLCPP_INFO_STREAM(this->get_logger(), "cols: " << image.cols);
-        std::string homedir = getenv("HOME");
-        cv::imwrite(homedir + "/Pictures/saved_image.jpg", image);
+        //
+        // convert the quaternion message to a quaternion
+        //
+        tf2::Quaternion tf_quat;
+        tf2::fromMsg(odom_ptr->pose.pose.orientation, tf_quat);
+        //
+        // retrieve the yaw value from the quaternion
+        //
+        //double theta = tf2::getYaw(tf_quat);
+        double roll;
+        double pitch;
+        double theta;
+        tf2::Matrix3x3 mat(tf_quat);
+        mat.getRPY(roll, pitch, theta);
+        RCLCPP_INFO_STREAM(this->get_logger(), "theta: " << theta);
+        //
+        // retrieve the x and y position and display
+        //
+        double x = odom_ptr->pose.pose.position.x;
+        double y = odom_ptr->pose.pose.position.y;
+        RCLCPP_INFO_STREAM(this->get_logger(), "x: " << x << ", y: " << y);
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
     geometry_msgs::msg::Twist cmd_vel_msg_;
     rclcpp::Service<qbot_nodes_cpp::srv::HeadingSpeed>::SharedPtr service_;
-    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
     double curr_heading_;
     double new_heading_;
     double old_heading_;
