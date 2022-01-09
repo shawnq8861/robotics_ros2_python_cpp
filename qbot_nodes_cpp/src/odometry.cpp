@@ -165,32 +165,32 @@ int main(int argc, char * argv[])
     //
     // use rt extensions
     //
-    int rc = -1;
-	struct sched_param my_params;
+    //int rc = -1;
+	//struct sched_param my_params;
     //
 	// Passing zero specifies caller’s (our) policy
     //
-	my_params.sched_priority = odometry_priority;
+	//my_params.sched_priority = odometry_priority;
     //
 	// Passing zero specifies callers (our) pid
     // Set policy to SCHED_RR, no preemption with time slicing
     //
-	rc = sched_setscheduler(0, SCHED_RR, &my_params);
-    if ( rc == -1 ) {
-        std::cout << "could not change scheduler policy" << std::endl;
-    }
-    else {
-        std::cout << "changed scheduler policy" << std::endl;
-    }
+	//rc = sched_setscheduler(0, SCHED_RR, &my_params);
+    //if ( rc == -1 ) {
+    //    std::cout << "could not change scheduler policy" << std::endl;
+    //}
+    //else {
+    //    std::cout << "changed scheduler policy" << std::endl;
+    //}
     //
     // lock memory to prevent paging after instantiations are complete
     //
-    mlockall(MCL_CURRENT | MCL_FUTURE);
+    //mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
     //
     // unlock memory before teardown
     //
-    munlockall();
+    //munlockall();
     rclcpp::shutdown();
     return 0;
 }

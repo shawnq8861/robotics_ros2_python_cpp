@@ -3,7 +3,6 @@
 // ros2 run qbot_nodes_cpp local_planner
 //
 
-//#include <chrono>
 #include <functional>
 #include <memory>
 #include <sched.h>
@@ -18,8 +17,6 @@
 #include "qbot_nodes_cpp/srv/heading_speed.hpp"
 #include "robot_configuration.hpp"
 
-//using namespace std::chrono_literals;
-
 using std::placeholders::_1;
 
 class LocalPlanner : public rclcpp::Node
@@ -29,7 +26,6 @@ public:
     : Node("local_planner")
     {
         publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-        //period_ = 500ms;
         period_ = timer_period;
         period_mag_ = period_.count();
         timer_ = this->create_wall_timer(
@@ -136,10 +132,10 @@ private:
             //          run at faster update rates
             //
             if (theta_ < curr_heading_) {
-                omega_ = max_v_angular;
+                omega_ = angular_adjustment;
             }
             else if (theta_ > curr_heading_) {
-                omega_ = -max_v_angular;
+                omega_ = -angular_adjustment;
             }
             else {
                 omega_ = 0.0;
@@ -197,32 +193,32 @@ int main(int argc, char * argv[])
     //
     // use rt extensions
     //
-    int rc = -1;
-	struct sched_param my_params;
+    //int rc = -1;
+	//struct sched_param my_params;
     //
 	// Passing zero specifies caller’s (our) policy
     //
-	my_params.sched_priority = local_planner_priority;
+	//my_params.sched_priority = local_planner_priority;
     //
 	// Passing zero specifies callers (our) pid
     // Set policy to SCHED_RR, no preemption with time slicing
     //
-	rc = sched_setscheduler(0, SCHED_RR, &my_params);
-    if ( rc == -1 ) {
-        std::cout << "could not change scheduler policy" << std::endl;
-    }
-    else {
-        std::cout << "changed scheduler policy" << std::endl;
-    }
+	//rc = sched_setscheduler(0, SCHED_RR, &my_params);
+    //if ( rc == -1 ) {
+    //    std::cout << "could not change scheduler policy" << std::endl;
+    //}
+    //else {
+    //    std::cout << "changed scheduler policy" << std::endl;
+    //}
     //
     // lock memory to prevent paging after instantiations are complete
     //
-    mlockall(MCL_CURRENT | MCL_FUTURE);
+    //mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
     //
     // unlock memory before teardown
     //
-    munlockall();
+    //munlockall();
     rclcpp::shutdown();
     return 0;
 }
