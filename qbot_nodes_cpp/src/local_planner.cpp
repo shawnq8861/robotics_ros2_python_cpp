@@ -37,7 +37,7 @@ public:
         new_heading_ = curr_heading_;
         old_heading_ = curr_heading_;
         omega_ = 0.0;
-        //rotation_step_ = max_v_angular;
+        theta_ = 0.0;
         curr_speed_ = 0.0;
         new_speed_ = curr_speed_;
         old_speed_ = curr_speed_;
@@ -129,12 +129,20 @@ private:
         else {
             curr_heading_ = new_heading_;
             old_heading_ = new_heading_;
-            omega_ = 0.0;
             //
             // TODO: read the odometry and make adjustment
             //       add a subcrober to odom topic
             //       look into async spinner for ROS 2
             //
+            if (theta_ < curr_heading_) {
+                omega_ = max_v_angular;
+            }
+            else if (theta_ > curr_heading_) {
+                omega_ = -max_v_angular;
+            }
+            else {
+                omega_ = 0.0;
+            }
         }
         RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
         cmd_vel_msg_.linear.x = curr_speed_;
@@ -157,16 +165,9 @@ private:
         //double theta = tf2::getYaw(tf_quat);
         double roll;
         double pitch;
-        double theta;
         tf2::Matrix3x3 mat(tf_quat);
-        mat.getRPY(roll, pitch, theta);
-        RCLCPP_INFO_STREAM(this->get_logger(), "theta: " << theta);
-        //
-        // retrieve the x and y position and display
-        //
-        double x = odom_ptr->pose.pose.position.x;
-        double y = odom_ptr->pose.pose.position.y;
-        RCLCPP_INFO_STREAM(this->get_logger(), "x: " << x << ", y: " << y);
+        mat.getRPY(roll, pitch, theta_);
+        RCLCPP_INFO_STREAM(this->get_logger(), "theta: " << theta_);
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
@@ -183,9 +184,9 @@ private:
     double old_speed_;
     double speed_delta_;
     double heading_delta_;
+    double theta_;
     std::chrono::milliseconds period_;
     unsigned int period_mag_;
-    int count_;
 };
 
 int main(int argc, char * argv[])
