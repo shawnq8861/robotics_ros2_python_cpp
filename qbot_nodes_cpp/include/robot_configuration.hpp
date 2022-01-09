@@ -10,8 +10,6 @@
 using namespace std::chrono_literals;
 
 static constexpr int base_controller_priority = 97;
-static constexpr int local_planner_priority = 95;
-static constexpr int odometry_priority = 96;
 static constexpr int8_t max_retries = 5;
 static constexpr double wheel_base = 18.0;
 static constexpr double wheel_diameter = 6.0;

@@ -1,5 +1,4 @@
 #include <memory>
-//#include <chrono>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
@@ -10,7 +9,6 @@
 #include <sys/mman.h>
 #include "robot_configuration.hpp"
 
-//using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 class BaseController : public rclcpp::Node
@@ -23,7 +21,6 @@ public:
     {
         enc_counts.enc1_cnt = 0;
         enc_counts.enc2_cnt = 0;
-        //period_ = 500ms;
         period_ = timer_period;
         period_mag_ = period_.count();
         timer_ = this->create_wall_timer(

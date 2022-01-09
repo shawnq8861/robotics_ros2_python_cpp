@@ -114,27 +114,29 @@ private:
         //
         tf_broadcaster_->sendTransform(odom_trans);
         //
-        // next, we'll publish the odometry message over ROS
+        // setup and publish the odometry message over ROS
         //
         nav_msgs::msg::Odometry odom;
         odom.header.stamp = curr_time_;
         odom.header.frame_id = "odom";
         geometry_msgs::msg::Quaternion odom_quat = tf2::toMsg(tf_quat);
         //
-        //set the position
+        // set the position
         //
         odom.pose.pose.position.x = x_;
         odom.pose.pose.position.y = y_;
         odom.pose.pose.position.z = 0.0;
         odom.pose.pose.orientation = odom_quat;
-        
-        //set the velocity
+        //
+        // set the velocity
+        //
         odom.child_frame_id = "base_link";
         odom.twist.twist.linear.x = vx_;
         odom.twist.twist.linear.y = vy_;
         odom.twist.twist.angular.z = vth_;
-        
-        //publish the message
+        //
+        // publish the message
+        //
         publisher_->publish(odom);
 
         prev_time_ = curr_time_;
@@ -162,35 +164,7 @@ int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<Odometry>();
-    //
-    // use rt extensions
-    //
-    //int rc = -1;
-	//struct sched_param my_params;
-    //
-	// Passing zero specifies caller’s (our) policy
-    //
-	//my_params.sched_priority = odometry_priority;
-    //
-	// Passing zero specifies callers (our) pid
-    // Set policy to SCHED_RR, no preemption with time slicing
-    //
-	//rc = sched_setscheduler(0, SCHED_RR, &my_params);
-    //if ( rc == -1 ) {
-    //    std::cout << "could not change scheduler policy" << std::endl;
-    //}
-    //else {
-    //    std::cout << "changed scheduler policy" << std::endl;
-    //}
-    //
-    // lock memory to prevent paging after instantiations are complete
-    //
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
     rclcpp::spin(node);
-    //
-    // unlock memory before teardown
-    //
-    //munlockall();
     rclcpp::shutdown();
     return 0;
 }
