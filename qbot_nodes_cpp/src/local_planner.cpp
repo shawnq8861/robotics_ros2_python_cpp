@@ -3,7 +3,7 @@
 // ros2 run qbot_nodes_cpp local_planner
 //
 
-#include <chrono>
+//#include <chrono>
 #include <functional>
 #include <memory>
 #include <sched.h>
@@ -18,7 +18,7 @@
 #include "qbot_nodes_cpp/srv/heading_speed.hpp"
 #include "robot_configuration.hpp"
 
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 using std::placeholders::_1;
 
@@ -29,7 +29,8 @@ public:
     : Node("local_planner")
     {
         publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-        period_ = 500ms;
+        //period_ = 500ms;
+        period_ = timer_period;
         period_mag_ = period_.count();
         timer_ = this->create_wall_timer(
             period_, std::bind(&LocalPlanner::timer_callback, this));
@@ -130,9 +131,9 @@ private:
             curr_heading_ = new_heading_;
             old_heading_ = new_heading_;
             //
-            // TODO: read the odometry and make adjustment
-            //       add a subcrober to odom topic
-            //       look into async spinner for ROS 2
+            // TODO: fine tune this:
+            //          use smaller changes
+            //          run at faster update rates
             //
             if (theta_ < curr_heading_) {
                 omega_ = max_v_angular;
