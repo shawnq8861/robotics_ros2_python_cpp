@@ -85,7 +85,6 @@ add_executable(local_planner src/local_planner.cpp)
 ament_target_dependencies(local_planner 
   rclcpp
   geometry_msgs
-  sensor_msgs
   nav_msgs)
 target_include_directories(local_planner PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
