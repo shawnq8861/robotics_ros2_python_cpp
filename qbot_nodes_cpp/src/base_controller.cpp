@@ -65,17 +65,20 @@ private:
         RCLCPP_INFO(this->get_logger(), "left encoder: '%d', right encoder: '%d'", enc_counts.enc1_cnt, enc_counts.enc2_cnt);
         publisher_->publish(enc_counts);
     }
+
     void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
         v_linear_ = msg->linear.x;
         v_angular_ = msg->angular.z;
-        RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", v_linear_);
-        RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", v_angular_);
+        RCLCPP_INFO_STREAM(this->get_logger(), "new spd: " << v_linear_ << ", new ang: " << v_angular_);
+        //RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", v_linear_);
+        //RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", v_angular_);
         //
         // need to read and publish encoder count
         //
         drive_wheels();
     }
+
     void drive_wheels() {
         int retry_count = 0;
         int response = ROBOCLAW_ERROR;
@@ -109,9 +112,9 @@ private:
         // duty left = rpm left / rpm max
         //
         double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
-        RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
         double linear_left = (2.0 * v_linear_) - linear_right;
-        RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
         double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
         double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
 		//	
@@ -154,9 +157,14 @@ int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
     //
+    // use multithreaded executor to improve performance
+    //
+    rclcpp::executors::MultiThreadedExecutor executor;
+    //
     // instantiate the node
     //
     auto node = std::make_shared<BaseController>();
+    executor.add_node(node);
     //
     // use rt extensions
     //
@@ -181,7 +189,7 @@ int main(int argc, char * argv[])
     // lock memory to prevent paging after instantiations are complete
     //
     mlockall(MCL_CURRENT | MCL_FUTURE);
-    rclcpp::spin(node);
+    executor.spin();
     //
     // unlock memory before teardown
     //

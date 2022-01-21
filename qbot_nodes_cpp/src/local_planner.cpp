@@ -141,11 +141,13 @@ private:
                 omega_ = 0.0;
             }
         }
-        RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
+        //RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
         cmd_vel_msg_.linear.x = curr_speed_;
-        RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg_.linear.x);
+        //RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg_.linear.x);
         cmd_vel_msg_.angular.z = omega_;
-        RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg_.angular.z);
+        //RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg_.angular.z);
+        RCLCPP_INFO_STREAM(this->get_logger(), "\nlinear x: " << cmd_vel_msg_.linear.x
+                                                << ", angular z: " << cmd_vel_msg_.angular.z);
         publisher_->publish(cmd_vel_msg_);
     }
 

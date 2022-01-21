@@ -71,13 +71,13 @@ private:
         //
         enc_m1_curr_ = msg->enc1_cnt;
         enc_m2_curr_ = msg->enc2_cnt;
-        RCLCPP_INFO_STREAM(this->get_logger(), "enc_m1_curr_: " << enc_m1_curr_ << ", enc_m2_curr_: " << enc_m2_curr_);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "enc_m1_curr_: " << enc_m1_curr_ << ", enc_m2_curr_: " << enc_m2_curr_);
         double delta_left = ((pi * wheel_diameter) * ((double)(enc_m1_curr_ - enc_m1_prev_))) / ((double)(enc_counts_per_rev));
         double delta_right = ((pi * wheel_diameter) * ((double)(enc_m2_curr_ - enc_m2_prev_))) / ((double)(enc_counts_per_rev));
-        RCLCPP_INFO_STREAM(this->get_logger(), "delta_left: " << delta_left << ", delta_right: " << delta_right);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "delta_left: " << delta_left << ", delta_right: " << delta_right);
         double delta_dist = (delta_right + delta_left) / 2.0;
         double delta_th = (delta_right - delta_left) / wheel_base;
-        RCLCPP_INFO_STREAM(this->get_logger(), "delta_dist: " << delta_dist << ", delta_th: " << delta_th);
+        //RCLCPP_INFO_STREAM(this->get_logger(), "delta_dist: " << delta_dist << ", delta_th: " << delta_th);
         double delta_x = delta_dist * cos(theta_ + (delta_th / 2.0));
         double delta_y = delta_dist * sin(theta_ + (delta_th / 2.0));
         theta_ += delta_th;
@@ -86,7 +86,7 @@ private:
         vx_ = delta_x / dt_sec;
         vy_ = delta_y / dt_sec;
         vth_ = delta_th / dt_sec;
-        RCLCPP_INFO_STREAM(this->get_logger(), "odometry x: " << x_ << ", y: " << y_ << ", theta: " << theta_);
+        RCLCPP_INFO_STREAM(this->get_logger(), "\nodometry x: " << x_ << ", y: " << y_ << ", theta: " << theta_);
         //
         // since all odometry is 6DOF we'll need a quaternion created from yaw
         //
