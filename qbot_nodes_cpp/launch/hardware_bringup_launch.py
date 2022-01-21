@@ -17,7 +17,7 @@ def generate_launch_description():
             name='local_planner'
         ),
         Node(
-            package='qbot_node_cpp',
+            package='qbot_nodes_cpp',
             executable='odometry',
             name='odometry'
         )
