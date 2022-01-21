@@ -141,11 +141,8 @@ private:
                 omega_ = 0.0;
             }
         }
-        //RCLCPP_INFO(this->get_logger(), "Heading: '%f', speed: '%f'", curr_heading_, curr_speed_);
         cmd_vel_msg_.linear.x = curr_speed_;
-        //RCLCPP_INFO(this->get_logger(), "Publishing linear x: '%f'", cmd_vel_msg_.linear.x);
         cmd_vel_msg_.angular.z = omega_;
-        //RCLCPP_INFO(this->get_logger(), "Publishing angular z: '%f'", cmd_vel_msg_.angular.z);
         RCLCPP_INFO_STREAM(this->get_logger(), "\nlinear x: " << cmd_vel_msg_.linear.x
                                                 << ", angular z: " << cmd_vel_msg_.angular.z);
         publisher_->publish(cmd_vel_msg_);
@@ -165,7 +162,6 @@ private:
         double pitch;
         tf2::Matrix3x3 mat(tf_quat);
         mat.getRPY(roll, pitch, theta_);
-        RCLCPP_INFO_STREAM(this->get_logger(), "theta: " << theta_);
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
@@ -190,8 +186,13 @@ private:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
+    //
+    // use multithreaded executor to improve performance
+    //
+    rclcpp::executors::MultiThreadedExecutor executor;
     auto node = std::make_shared<LocalPlanner>();
-    rclcpp::spin(node);
+    executor.add_node(node);
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }

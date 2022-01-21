@@ -71,13 +71,10 @@ private:
         //
         enc_m1_curr_ = msg->enc1_cnt;
         enc_m2_curr_ = msg->enc2_cnt;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "enc_m1_curr_: " << enc_m1_curr_ << ", enc_m2_curr_: " << enc_m2_curr_);
         double delta_left = ((pi * wheel_diameter) * ((double)(enc_m1_curr_ - enc_m1_prev_))) / ((double)(enc_counts_per_rev));
         double delta_right = ((pi * wheel_diameter) * ((double)(enc_m2_curr_ - enc_m2_prev_))) / ((double)(enc_counts_per_rev));
-        //RCLCPP_INFO_STREAM(this->get_logger(), "delta_left: " << delta_left << ", delta_right: " << delta_right);
         double delta_dist = (delta_right + delta_left) / 2.0;
         double delta_th = (delta_right - delta_left) / wheel_base;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "delta_dist: " << delta_dist << ", delta_th: " << delta_th);
         double delta_x = delta_dist * cos(theta_ + (delta_th / 2.0));
         double delta_y = delta_dist * sin(theta_ + (delta_th / 2.0));
         theta_ += delta_th;

@@ -58,7 +58,6 @@ private:
         }
         //
         // publish counts
-        // put in a timer callback instead
         //
         enc_counts.enc1_cnt = enc_m1_;
         enc_counts.enc2_cnt = enc_m2_;
@@ -71,8 +70,6 @@ private:
         v_linear_ = msg->linear.x;
         v_angular_ = msg->angular.z;
         RCLCPP_INFO_STREAM(this->get_logger(), "new spd: " << v_linear_ << ", new ang: " << v_angular_);
-        //RCLCPP_INFO(this->get_logger(), "I heard forward speed: [%f]", v_linear_);
-        //RCLCPP_INFO(this->get_logger(), "I heard angular speed: [%f]", v_angular_);
         //
         // need to read and publish encoder count
         //
@@ -112,9 +109,7 @@ private:
         // duty left = rpm left / rpm max
         //
         double linear_right = v_linear_ + ((v_angular_ * wheel_base) / 2.0);
-        //RCLCPP_INFO_STREAM(this->get_logger(), "linear_right: " << linear_right);
         double linear_left = (2.0 * v_linear_) - linear_right;
-        //RCLCPP_INFO_STREAM(this->get_logger(), "linear_left: " << linear_left);
         double rpm_right = 60.0 * (linear_right / (pi * wheel_diameter));
         double rpm_left = 60.0 * (linear_left / (pi * wheel_diameter));
 		//	
