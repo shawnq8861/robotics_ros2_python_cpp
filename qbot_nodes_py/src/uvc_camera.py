@@ -77,6 +77,8 @@ class UVCCamera(Node):
             # than camera frame rate, that way the callback never misses the 
             # next frame
             #
+            self.cap.set(cv2.CAP_PROP_FPS, 30.0)
+            fps = float(self.cap.get(cv2.CAP_PROP_FPS))
             print("fps = ", fps)
             timer_period = 1.0 / (1.05 * fps)
 
