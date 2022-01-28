@@ -25,7 +25,7 @@ class UVCCamera(Node):
         self.i = 0
         #self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
-        self.idx = camera_idx
+        self.camera_idx = camera_idx
         print("camera idx = ", self.camera_idx)
         self.cap = cv2.VideoCapture()
         self.timer_period = self.init_camera()
@@ -57,7 +57,7 @@ class UVCCamera(Node):
     #    return response
 
     def init_camera(self):
-        self.cap.open(self.idx)
+        self.cap.open(self.camera_idx)
         if self.cap.isOpened():
             print("opened camera...")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
