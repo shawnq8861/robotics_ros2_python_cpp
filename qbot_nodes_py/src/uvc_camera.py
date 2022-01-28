@@ -15,7 +15,7 @@ import cv2
 import argparse
 import time
 
-from qbot_nodes_cpp.srv import CameraCommand
+#from qbot_nodes_cpp.srv import CameraCommand
 
 class UVCCamera(Node):
 
@@ -23,7 +23,7 @@ class UVCCamera(Node):
         super().__init__('uvc_camera')
         self.camera_command = 99
         self.i = 0
-        self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
+        #self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
         print("camera idx = ", camera_idx)
         self.idx = camera_idx
@@ -48,11 +48,11 @@ class UVCCamera(Node):
         if self.camera_command == 1:
             cv2.imwrite(new_time + '.png', self.frame)
 
-    def camera_command_callback(self, request, response):
-        self.camera_command = request.command
-        self.get_logger().info('Incoming request.command: %d' % (request.command))
+    #def camera_command_callback(self, request, response):
+    #    self.camera_command = request.command
+    #    self.get_logger().info('Incoming request.command: %d' % (request.command))
 
-        return response
+    #    return response
 
     def init_camera(self):
         self.cap.open(self.idx)
