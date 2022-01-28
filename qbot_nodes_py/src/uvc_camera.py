@@ -77,10 +77,10 @@ class UVCCamera(Node):
             #
             timer_period = 1.0 / (1.05 * fps)
 
-        return timer_period
-
         else:
             print("could not open camera...")
+
+        return timer_period
 
 def main(args=None):
 
