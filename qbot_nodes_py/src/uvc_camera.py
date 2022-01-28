@@ -28,9 +28,9 @@ class UVCCamera(Node):
         print("camera idx = ", camera_idx)
         self.idx = camera_idx
         self.cap = cv2.VideoCapture()
-        self.init_camera()
-        self.timer_period = timer_period
-        self.tmr = self.create_timer(timer_period, self.timer_callback)
+        self.timer_period = self.init_camera()
+        #self.timer_period = timer_period
+        self.tmr = self.create_timer(self.timer_period, self.timer_callback)
 
     def timer_callback(self):
         msg = String()
@@ -60,6 +60,24 @@ class UVCCamera(Node):
             print("opened camera...")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            #
+            # retrieve frame rate, which is equal to 1/period
+            #
+            timer_period = 10.0
+            fps = float(self.cap.get(cv2.CAP_PROP_FPS))
+            self.get_logger().info("frames per second = %f" % fps)
+            width = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+            self.get_logger().info("width = %d" % width)
+            height = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            self.get_logger().info("height = %d" % height)
+            #
+            # set timer period to result in an update rate slightly faster 
+            # than camera frame rate, that way the callback never misses the 
+            # next frame
+            #
+            timer_period = 1.0 / (1.05 * fps)
+
+        return timer_period
 
         else:
             print("could not open camera...")
