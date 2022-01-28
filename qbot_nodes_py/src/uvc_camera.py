@@ -25,10 +25,11 @@ class UVCCamera(Node):
         self.i = 0
         #self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
-        print("camera idx = ", camera_idx)
         self.idx = camera_idx
+        print("camera idx = ", self.camera_idx)
         self.cap = cv2.VideoCapture()
         self.timer_period = self.init_camera()
+        print("timer_period = ", self.timer_period)
         #self.timer_period = timer_period
         self.tmr = self.create_timer(self.timer_period, self.timer_callback)
 
@@ -42,6 +43,7 @@ class UVCCamera(Node):
         h,  w = self.frame.shape[:2]
         print("cols = ", w)
         print("rows = ", h)
+        print("fps = ", 1.0/self.timer_period)
         curr_time = time.ctime()
         new_time = curr_time.replace(' ', '_')
         print(new_time)
@@ -75,6 +77,7 @@ class UVCCamera(Node):
             # than camera frame rate, that way the callback never misses the 
             # next frame
             #
+            print("fps = ", fps)
             timer_period = 1.0 / (1.05 * fps)
 
         else:
