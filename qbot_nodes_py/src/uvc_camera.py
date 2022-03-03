@@ -60,8 +60,8 @@ class UVCCamera(Node):
         self.cap.open(self.camera_idx)
         if self.cap.isOpened():
             print("opened camera...")
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
             #
             # retrieve frame rate, which is equal to 1/period
             #
