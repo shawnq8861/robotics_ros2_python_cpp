@@ -19,7 +19,7 @@ import time
 
 class UVCCamera(Node):
 
-    def __init__(self, camera_idx, timer_period):
+    def __init__(self, camera_idx, fps):
         super().__init__('uvc_camera')
         self.camera_command = 99
         self.i = 0
@@ -31,6 +31,7 @@ class UVCCamera(Node):
         self.timer_period = self.init_camera()
         print("timer_period = ", self.timer_period)
         #self.timer_period = timer_period
+        self.fps = fps
         self.tmr = self.create_timer(self.timer_period, self.timer_callback)
 
     def timer_callback(self):
@@ -66,7 +67,8 @@ class UVCCamera(Node):
             print("opened camera...")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-            self.cap.set(cv2.CAP_PROP_FPS, 15.0)
+            #self.cap.set(cv2.CAP_PROP_FPS, 15.0)
+            self.cap.set(cv2.CAP_PROP_FPS, self.fps)
             #
             # retrieve frame rate, which is equal to 1/period
             #
