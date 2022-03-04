@@ -28,10 +28,10 @@ class UVCCamera(Node):
         self.camera_idx = camera_idx
         self.fps = fps
         print("camera idx = ", self.camera_idx)
+        print("fps = ", self.fps)
         self.cap = cv2.VideoCapture()
         #self.timer_period = self.init_camera()
         self.init_camera()
-        print("fps = ", self.fps)
         #self.timer_period = timer_period
         self.timer_period = 1.0 / (1.05 * self.fps)
         self.tmr = self.create_timer(self.timer_period, self.timer_callback)
