@@ -26,12 +26,14 @@ class UVCCamera(Node):
         #self.srv = self.create_service(CameraCommand, 'uvc_camera/camera_command', self.camera_command_callback)
         self.pub = self.create_publisher(String, 'pub_chatter', 10)
         self.camera_idx = camera_idx
+        self.fps = fps
         print("camera idx = ", self.camera_idx)
         self.cap = cv2.VideoCapture()
-        self.timer_period = self.init_camera()
-        print("timer_period = ", self.timer_period)
+        #self.timer_period = self.init_camera()
+        self.init_camera()
+        print("fps = ", self.fps)
         #self.timer_period = timer_period
-        self.fps = fps
+        self.timer_period = 1.0 / (1.05 * self.fps)
         self.tmr = self.create_timer(self.timer_period, self.timer_callback)
 
     def timer_callback(self):
@@ -72,9 +74,9 @@ class UVCCamera(Node):
             #
             # retrieve frame rate, which is equal to 1/period
             #
-            timer_period = 10.0
-            fps = float(self.cap.get(cv2.CAP_PROP_FPS))
-            self.get_logger().info("frames per second = %f" % fps)
+            #fps = 10.0
+            #fps = float(self.cap.get(cv2.CAP_PROP_FPS))
+            #self.get_logger().info("frames per second = %f" % fps)
             width = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
             self.get_logger().info("width = %d" % width)
             height = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -87,23 +89,25 @@ class UVCCamera(Node):
             #self.cap.set(cv2.CAP_PROP_FPS, 30.0)
             fps = float(self.cap.get(cv2.CAP_PROP_FPS))
             print("fps = ", fps)
-            timer_period = 1.0 / (1.05 * fps)
+            #timer_period = 1.0 / (1.05 * fps)
 
         else:
             print("could not open camera...")
 
-        return timer_period
+        #return fps
 
 def main(args=None):
 
     parser = argparse.ArgumentParser(description='Process an integer arg and a float arg')
     parser.add_argument('camera_idx', type=int)
-    parser.add_argument('timer_period', type=float)
+    #parser.add_argument('timer_period', type=float)
+    parser.add_argument('fps', type=float)
     args = parser.parse_args()
 
     rclpy.init()
 
-    uvc_camera = UVCCamera(args.camera_idx, args.timer_period)
+    #uvc_camera = UVCCamera(args.camera_idx, args.timer_period)
+    uvc_camera = UVCCamera(args.camera_idx, args.fps)
 
     rclpy.spin(uvc_camera)
     cv2.destroyAllWindows()
