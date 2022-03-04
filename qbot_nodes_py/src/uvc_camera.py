@@ -46,7 +46,7 @@ class UVCCamera(Node):
         h,  w = self.frame.shape[:2]
         print("cols = ", w)
         print("rows = ", h)
-        print("fps = ", 1.0/self.timer_period)
+        print("timer frequency = ", 1.0/self.timer_period)
         curr_time = time.ctime()
         new_time = curr_time.replace(' ', '_')
         print(new_time)
@@ -88,7 +88,7 @@ class UVCCamera(Node):
             #
             #self.cap.set(cv2.CAP_PROP_FPS, 30.0)
             fps = float(self.cap.get(cv2.CAP_PROP_FPS))
-            print("fps = ", fps)
+            print("camera fps = ", fps)
             #timer_period = 1.0 / (1.05 * fps)
 
         else:
