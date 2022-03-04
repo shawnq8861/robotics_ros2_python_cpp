@@ -47,9 +47,13 @@ class UVCCamera(Node):
         curr_time = time.ctime()
         new_time = curr_time.replace(' ', '_')
         print(new_time)
-        if self.camera_command == 1:
-            cv2.imwrite(new_time + '.png', self.frame)
-
+        #if self.camera_command == 1:
+        #    cv2.imwrite(new_time + '.png', self.frame)
+        scale = 2
+        small_frame = cv2.resize(self.frame, (int(w/scale), int(h/scale)))
+        cv2.imshow("Live Image", small_frame)
+        cv2.waitKey(1)
+        
     #def camera_command_callback(self, request, response):
     #    self.camera_command = request.command
     #    self.get_logger().info('Incoming request.command: %d' % (request.command))
@@ -62,6 +66,7 @@ class UVCCamera(Node):
             print("opened camera...")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            self.cap.set(cv2.CAP_PROP_FPS, 15.0)
             #
             # retrieve frame rate, which is equal to 1/period
             #
@@ -77,7 +82,7 @@ class UVCCamera(Node):
             # than camera frame rate, that way the callback never misses the 
             # next frame
             #
-            self.cap.set(cv2.CAP_PROP_FPS, 30.0)
+            #self.cap.set(cv2.CAP_PROP_FPS, 30.0)
             fps = float(self.cap.get(cv2.CAP_PROP_FPS))
             print("fps = ", fps)
             timer_period = 1.0 / (1.05 * fps)
@@ -99,7 +104,7 @@ def main(args=None):
     uvc_camera = UVCCamera(args.camera_idx, args.timer_period)
 
     rclpy.spin(uvc_camera)
-
+    cv2.destroyAllWindows()
     uvc_camera.destroy_node()
     rclpy.shutdown()
 
