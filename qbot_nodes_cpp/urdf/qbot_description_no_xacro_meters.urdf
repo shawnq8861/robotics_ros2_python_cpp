@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<robot name="qbot">
+
+  <!-- Define robot constants -->
+  <!-- x-axis points forward, y-axis points to left, z-axis points upwards -->
+
+  <!-- Robot Base -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 3.1415926"/>
+      <geometry>
+        <mesh filename="package://qbot_nodes_cpp/meshes/rover_base.stl" scale=".0254 .0254 .0254"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Robot Footprint -->
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0.0 0.0 -.0508" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Left Wheel -->
+  <link name="drivewhl_l_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+          <cylinder radius=".0762" length=".0508"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="drivewhl_l_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="drivewhl_l_link"/>
+    <origin xyz="-.0762 .1857 .0254" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+    <!-- Right Wheel -->
+  <link name="drivewhl_r_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+          <cylinder radius=".0762" length=".0508"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="drivewhl_r_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="drivewhl_r_link"/>
+    <origin xyz="-.0762 -.1857 .0254" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- Caster Wheel -->
+  <link name="front_caster">
+    <visual>
+      <geometry>
+        <sphere radius=".0318"/>
+      </geometry>
+      <material name="Yellow">
+        <color rgba="1.0 1.0 0 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_caster"/>
+    <origin xyz=".1524 0.0 -.0191" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_laser">
+    <visual>
+      <geometry>
+        <box size=".0254 .0508 .0254"/>
+      </geometry>
+      <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+     
+  <joint name="base_to_laser" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_laser"/>
+    <origin xyz=".127 0 .0508" rpy="0 0 0"/>
+  </joint>
+
+</robot>
