@@ -52,10 +52,10 @@ class UVCCamera(Node):
         print(new_time)
         #if self.camera_command == 1:
         #    cv2.imwrite(new_time + '.png', self.frame)
-        #scale = 2
-        #small_frame = cv2.resize(self.frame, (int(w/scale), int(h/scale)))
-        #cv2.imshow("Live Image", small_frame)
-        #cv2.waitKey(1)
+        scale = 2.0
+        small_frame = cv2.resize(self.frame, (int(w/scale), int(h/scale)))
+        cv2.imshow("Live Image", small_frame)
+        cv2.waitKey(1)
         
     #def camera_command_callback(self, request, response):
     #    self.camera_command = request.command
